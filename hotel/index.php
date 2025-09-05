@@ -17,7 +17,7 @@
       </header>
 
       <div class="grid">
-        <a href="Front_desk/reservation.php" class="module">
+        <a href="reservation.php" class="module">
           <i class="fas fa-concierge-bell"></i>
           <span>Reservation & Front Desk</span>
         </a>
