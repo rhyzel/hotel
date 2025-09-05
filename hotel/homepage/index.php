@@ -21,7 +21,7 @@
           <i class="fas fa-concierge-bell"></i>
           <span>Reservation & Front Desk</span>
         </a>
-        <a href="housekeeping/housekeeping.php" class="module">
+        <a href="../housekeeping/housekeeping.php" class="module">
           <i class="fas fa-broom"></i>
           <span>Housekeeping</span>
         </a>
