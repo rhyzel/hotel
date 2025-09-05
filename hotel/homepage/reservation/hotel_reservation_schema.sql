@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS `rooms` (
   `room_number` VARCHAR(10) NOT NULL UNIQUE,
   `room_type` ENUM('Single Room', 'Double Room', 'Twin Room', 'Deluxe Room', 'Suite', 'Family Room') NOT NULL,
   `max_occupancy` INT,
-  `status` ENUM('available', 'occupied', 'reserved', 'maintenance') DEFAULT 'available',
+  'price_rate` DECIMAL(10,2),'
+  `status` ENUM('available', 'occupied', 'reserved', 'under maintenance', 'dirty') DEFAULT 'available',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

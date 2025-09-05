@@ -1,5 +1,5 @@
 <?php
-include 'db_connect.php';
+include '../db_connect.php';
 
 $sql = "SELECT room_id, room_number, room_type, max_occupancy, status, price_rate, created_at, updated_at FROM rooms";
 $result = $conn->query($sql);

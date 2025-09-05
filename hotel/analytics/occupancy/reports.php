@@ -18,7 +18,7 @@
 body, html {
   height: 100%;
   font-family: 'Outfit', sans-serif;
-  background: url('../homepage/hotel_room.jpg') no-repeat center center fixed;
+  background: url('../../homepage/hotel_room.jpg') no-repeat center center fixed;
   background-size: cover;
 }
 
@@ -129,7 +129,7 @@ header p {
       </div>
 
       <br>
-      <a href="../homepage/index.php" class="module" style="display:inline-block; background:rgba(255,255,255,0.15);">
+      <a href="../../homepage/index.php" class="module" style="display:inline-block; background:rgba(255,255,255,0.15);">
         <i class="fas fa-arrow-left"></i>
         <span>Back to Main Dashboard</span>
       </a>
