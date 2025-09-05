@@ -17,7 +17,7 @@
       </header>
 
       <div class="grid">
-        <a href="fetch_analytics.php" class="module">
+        <a href="room_analytics.php" class="module">
           <i class="fas fa-bed"></i>
           <span>Occupancy Report</span>
         </a>
