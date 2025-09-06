@@ -1,5 +1,5 @@
 <?php
-include '../db_connect.php';
+include '../../db_connect.php';
 
 // Get reservation information if ID is provided
 if (isset($_GET['id'])) {

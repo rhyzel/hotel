@@ -1,6 +1,6 @@
 <?php
 // API: Fetch room and guest bookings for the calendar
-include '../../db_connect.php';
+include '../../../db_connect.php';
 header('Content-Type: application/json');
 $type = $_GET['type'] ?? 'room';
 $id = $_GET['id'] ?? null;

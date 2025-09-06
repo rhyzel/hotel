@@ -1,6 +1,6 @@
 <?php
 // Include the database connection file, going up one directory
-include '../db_connect.php';
+include '../../db_connect.php';
 include 'popup_message.php';
 
 // Check if the form was submitted

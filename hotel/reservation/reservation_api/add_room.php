@@ -1,7 +1,7 @@
 <?php
 // Include the database connection file.
 // The path is '../' because this file is inside the 'reservation_api' folder.
-include '../db_connect.php';
+include '../../db_connect.php';
 include 'popup_message.php';
 
 // Check if the form has been submitted

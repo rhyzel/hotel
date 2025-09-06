@@ -1,6 +1,6 @@
 <?php
 // API: Search for rooms or guests
-include '../../db_connect.php';
+include '../../../db_connect.php';
 header('Content-Type: application/json');
 
 $type = $_GET['type'] ?? '';

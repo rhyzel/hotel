@@ -1,5 +1,5 @@
 <?php
-include '../db_connect.php';
+include '../../db_connect.php';
 include 'popup_message.php';
 
 // Get guest information if ID is provided

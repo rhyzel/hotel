@@ -9,7 +9,7 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body, html { height: 100%; font-family: 'Outfit', sans-serif;
-  background: url('../homepage/hotel_room.jpg') no-repeat center center fixed;
+  background: url('../../homepage/hotel_room.jpg') no-repeat center center fixed;
   background-size: cover; }
 .overlay { background: rgba(0, 0, 0, 0.7); min-height: 100vh;
   display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }

@@ -53,7 +53,7 @@
           <i class="fas fa-tools"></i>
           <span>Maintenance</span>
         </a>
-        <a href="../analytics/reports.php" class="module">
+        <a href="/hotel/analytics/occupancy/reports.php" class="module">
           <i class="fas fa-chart-line"></i>
           <span>Reports & Analytics</span>
         </a>
