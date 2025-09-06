@@ -1,10 +1,10 @@
--- Create the schema
-CREATE SCHEMA IF NOT EXISTS `reservation_and_front_desk_management`;
+-- Create the database
+CREATE DATABASE IF NOT EXISTS `hotel`;
 
--- Use the schema
-USE `reservation_and_front_desk_management`;
+-- Use the database
+USE `hotel`;
 
--- Create the guests table
+-- Guests table
 CREATE TABLE IF NOT EXISTS `guests` (
   `guest_id` INT AUTO_INCREMENT PRIMARY KEY,
   `first_name` VARCHAR(255) NOT NULL,
@@ -17,21 +17,19 @@ CREATE TABLE IF NOT EXISTS `guests` (
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-
--- Create the rooms table
+-- Rooms table
 CREATE TABLE IF NOT EXISTS `rooms` (
   `room_id` INT AUTO_INCREMENT PRIMARY KEY,
   `room_number` VARCHAR(10) NOT NULL UNIQUE,
-  `room_type` ENUM('Single Room', 'Double Room', 'Twin Room', 'Deluxe Room', 'Suite', 'Family Room') NOT NULL,
+  `room_type` ENUM('Single Room','Double Room','Twin Room','Deluxe Room','Suite','Family Room') NOT NULL,
   `max_occupancy` INT,
-  `price_rate` DECIMAL(10,2) NOT NULL,  
-  `status` ENUM('available', 'occupied', 'reserved', 'under maintenance', 'dirty') DEFAULT 'available',
+  `price_rate` DECIMAL(10,2) NOT NULL,
+  `status` ENUM('available','occupied','reserved','under maintenance','dirty') DEFAULT 'available',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-
--- Create the reservations table
+-- Reservations table
 CREATE TABLE IF NOT EXISTS `reservations` (
   `reservation_id` INT AUTO_INCREMENT PRIMARY KEY,
   `guest_id` INT NOT NULL,
@@ -43,44 +41,10 @@ CREATE TABLE IF NOT EXISTS `reservations` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (`guest_id`) REFERENCES `guests` (`guest_id`),
-
   FOREIGN KEY (`room_id`) REFERENCES `rooms` (`room_id`)
 );
 
--- Triggers to update the 'updated_at' field in the 'guests' table
-CREATE TRIGGER guests_before_update
-BEFORE UPDATE ON guests
-FOR EACH ROW
-SET NEW.updated_at = CURRENT_TIMESTAMP;
-
-CREATE TRIGGER guests_before_insert
-BEFORE INSERT ON guests
-FOR EACH ROW
-SET NEW.created_at = CURRENT_TIMESTAMP;
-
--- Triggers to update the 'updated_at' field in the 'rooms' table
-CREATE TRIGGER rooms_before_update
-BEFORE UPDATE ON rooms
-FOR EACH ROW
-SET NEW.updated_at = CURRENT_TIMESTAMP;
-
-CREATE TRIGGER rooms_before_insert
-BEFORE INSERT ON rooms
-FOR EACH ROW
-SET NEW.created_at = CURRENT_TIMESTAMP;
-
-CREATE TRIGGER reservations_before_update
-BEFORE UPDATE ON reservations
-FOR EACH ROW
-SET NEW.updated_at = CURRENT_TIMESTAMP;
-
-CREATE TRIGGER reservations_before_insert
-BEFORE INSERT ON reservations
-FOR EACH ROW
-SET NEW.created_at = CURRENT_TIMESTAMP;
-
-
--- Create the bookings table
+-- Bookings table
 CREATE TABLE IF NOT EXISTS `bookings` (
   `booking_id` INT AUTO_INCREMENT PRIMARY KEY,
   `guest_id` INT NOT NULL,
@@ -95,13 +59,7 @@ CREATE TABLE IF NOT EXISTS `bookings` (
   FOREIGN KEY (`room_id`) REFERENCES `rooms` (`room_id`)
 );
 
-ALTER TABLE `rooms`
-  CHANGE `room_types` `room_type` ENUM('Single Room', 'Double Room', 'Twin Room', 'Deluxe Room', 'Suite', 'Family Room') NOT NULL,
-  CHANGE `status` `status` ENUM('available', 'occupied', 'dirty', 'reserved', 'under maintenance') DEFAULT 'available',
-  ADD COLUMN `price_rate` DECIMAL(10,2) AFTER `status`;
-
-
--- Create the reservation_calendar table for calendar events/notes (optional, for custom events)
+-- Reservation calendar table
 CREATE TABLE IF NOT EXISTS `reservation_calendar` (
   `calendar_id` INT AUTO_INCREMENT PRIMARY KEY,
   `room_id` INT,
@@ -113,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `reservation_calendar` (
   FOREIGN KEY (`guest_id`) REFERENCES `guests` (`guest_id`)
 );
 
--- Create the walk_ins table
+-- Walk-ins table
 CREATE TABLE IF NOT EXISTS `walk_ins` (
     `walk_in_id` INT AUTO_INCREMENT PRIMARY KEY,
     `guest_id` INT NOT NULL,
@@ -121,8 +79,8 @@ CREATE TABLE IF NOT EXISTS `walk_ins` (
     `check_in_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `expected_check_out` DATETIME NOT NULL,
     `actual_check_out` DATETIME NULL,
-    `status` ENUM('checked_in', 'checked_out') DEFAULT 'checked_in',
-    `payment_status` ENUM('pending', 'partial', 'paid') DEFAULT 'pending',
+    `status` ENUM('checked_in','checked_out') DEFAULT 'checked_in',
+    `payment_status` ENUM('pending','partial','paid') DEFAULT 'pending',
     `total_amount` DECIMAL(10,2),
     `remarks` TEXT,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -131,19 +89,33 @@ CREATE TABLE IF NOT EXISTS `walk_ins` (
     FOREIGN KEY (`room_id`) REFERENCES `rooms` (`room_id`)
 );
 
--- Create triggers for walk_ins
+-- Triggers for updated_at fields
 DELIMITER //
-CREATE TRIGGER walk_ins_before_update
-BEFORE UPDATE ON walk_ins
+CREATE TRIGGER guests_before_update
+BEFORE UPDATE ON guests
 FOR EACH ROW
 BEGIN
     SET NEW.updated_at = CURRENT_TIMESTAMP;
 END//
 
-CREATE TRIGGER walk_ins_before_insert
-BEFORE INSERT ON walk_ins
+CREATE TRIGGER rooms_before_update
+BEFORE UPDATE ON rooms
 FOR EACH ROW
 BEGIN
-    SET NEW.created_at = CURRENT_TIMESTAMP;
+    SET NEW.updated_at = CURRENT_TIMESTAMP;
+END//
+
+CREATE TRIGGER reservations_before_update
+BEFORE UPDATE ON reservations
+FOR EACH ROW
+BEGIN
+    SET NEW.updated_at = CURRENT_TIMESTAMP;
+END//
+
+CREATE TRIGGER walk_ins_before_update
+BEFORE UPDATE ON walk_ins
+FOR EACH ROW
+BEGIN
+    SET NEW.updated_at = CURRENT_TIMESTAMP;
 END//
 DELIMITER ;
