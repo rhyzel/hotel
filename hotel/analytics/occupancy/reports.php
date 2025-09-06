@@ -106,7 +106,7 @@ header p {
       </header>
 
       <div class="grid">
-        <a href="../analytics/analytics_page.php" class="module">
+        <a href="analytics_page.php" class="module">
           <i class="fas fa-bed"></i>
           <span>Occupancy Report</span>
         </a>
