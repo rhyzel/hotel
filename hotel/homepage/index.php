@@ -41,7 +41,7 @@
           <i class="fas fa-users-cog"></i>
           <span>HR & Staff</span>
         </a>
-        <a href="inventory.php" class="module">
+        <a href="../inventory/inventory.php" class="module">
           <i class="fas fa-boxes"></i>
           <span>Inventory & Procurement</span>
         </a>
@@ -53,7 +53,7 @@
           <i class="fas fa-tools"></i>
           <span>Maintenance</span>
         </a>
-        <a href="/hotel/analytics/occupancy/reports.php" class="module">
+        <a href="../analytics/reports.php" class="module">
           <i class="fas fa-chart-line"></i>
           <span>Reports & Analytics</span>
         </a>

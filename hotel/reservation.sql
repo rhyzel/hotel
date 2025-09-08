@@ -44,21 +44,6 @@ CREATE TABLE IF NOT EXISTS `reservations` (
   FOREIGN KEY (`room_id`) REFERENCES `rooms` (`room_id`)
 );
 
--- Bookings table
-CREATE TABLE IF NOT EXISTS `bookings` (
-  `booking_id` INT AUTO_INCREMENT PRIMARY KEY,
-  `guest_id` INT NOT NULL,
-  `room_id` INT NOT NULL,
-  `booking_type` ENUM('reservation','walk-in'),
-  `status` ENUM('pending','confirmed','checked_in','checked_out') DEFAULT 'pending',
-  `remarks` TEXT,
-  `check_in` TIMESTAMP NULL,
-  `check_out` TIMESTAMP NULL,
-  `booking_date` DATE NOT NULL,
-  FOREIGN KEY (`guest_id`) REFERENCES `guests` (`guest_id`),
-  FOREIGN KEY (`room_id`) REFERENCES `rooms` (`room_id`)
-);
-
 -- Reservation calendar table
 CREATE TABLE IF NOT EXISTS `reservation_calendar` (
   `calendar_id` INT AUTO_INCREMENT PRIMARY KEY,
@@ -119,3 +104,4 @@ BEGIN
     SET NEW.updated_at = CURRENT_TIMESTAMP;
 END//
 DELIMITER ;
+

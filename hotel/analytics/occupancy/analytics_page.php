@@ -154,7 +154,7 @@ table tr:hover { background: rgba(255, 255, 255, 0.1); }
   pointer-events: none; /* so it doesn’t block typing */
 }
 </style>
-<a href="reports.php" style="position:absolute; top:0; right:0; padding:8px 15px; background:#e69419ff; color:#000; text-decoration:none; border-radius:8px; font-size:0.9rem; font-weight:600; margin:10px; display:flex; align-items:center; gap:6px;">&#8592; Back</a>
+<a href="../reports.php" style="position:absolute; top:0; right:0; padding:8px 15px; background:#e69419ff; color:#000; text-decoration:none; border-radius:8px; font-size:0.9rem; font-weight:600; margin:10px; display:flex; align-items:center; gap:6px;">&#8592; Back</a>
 </head>
 <body>
 <div class="overlay">
@@ -208,17 +208,18 @@ table tr:hover { background: rgba(255, 255, 255, 0.1); }
 
   <table>
     <thead>
-      <tr id="tableHeaders">
-        <th>Room ID</th>
-        <th>Room Number</th>
-        <th>Room Type</th>
-        <th>Max Occupancy</th>
-        <th>Status</th>
-        <th>Price Rate</th>
-        <th>Created At</th>
-        <th>Updated At</th>
-        <th></th> 
-      </tr>
+          <tr id="tableHeaders">
+      <th>Room ID</th>
+      <th>Room Number</th>
+      <th>Room Type</th>
+      <th>Max Occupancy</th>
+    <th>Guest ID</th> <!-- NEW -->
+    <th>Guest Name</th> <!-- NEW -->
+      <th>Status</th>
+      <th>Price Rate</th>
+      <th>Created At</th>
+      <th>Updated At</th>
+    </tr>
     </thead>
 
     <tbody id="roomTableBody">
@@ -230,7 +231,6 @@ table tr:hover { background: rgba(255, 255, 255, 0.1); }
 <button id="backToTop" style="margin: 20px auto 0 auto; display: block; padding: 10px 18px; background: #17a2b8; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600; transition: background 0.2s ease-in-out;">Back to Top</button>
 
 </div>
-
 <script>
 let rooms = [];
 let statusCounts = {};
@@ -253,37 +253,52 @@ const statusColors = {
   'occupied': '#dc3545'
 };
 
+// Render table
 function renderTable(data, label = "Room Details") {
   tableBody.innerHTML = "";
 
   if (data.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="9">No room data found</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="10">No room data found</td></tr>`;
     return;
   }
 
-  data.forEach(r => {
+  // Include guest columns if room status is reserved or occupied
+  const includeGuest = data.some(r => ['reserved','occupied'].includes(r.status.toLowerCase()));
+
+  // Update headers
+  const headers = document.getElementById("tableHeaders");
+  headers.innerHTML = `
+    <th>Room ID</th>
+    <th>Room Number</th>
+    <th>Room Type</th>
+    <th>Max Occupancy</th>
+    ${includeGuest ? `<th>Guest ID</th><th>Guest Name</th>` : ''}
+    <th>Status</th>
+    <th>Price Rate</th>
+    <th>Created At</th>
+    <th>Updated At</th>
+  `;
+
+  for (const r of data) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${r.room_id}</td>
       <td>${r.room_number}</td>
       <td>${r.room_type}</td>
       <td>${r.max_occupancy}</td>
+      ${includeGuest ? `<td>${r.guest_id || '-'}</td><td>${r.guest_name || '-'}</td>` : ''}
       <td>${r.status}</td>
       <td>${r.price_rate}</td>
       <td>${r.created_at}</td>
       <td>${r.updated_at}</td>
-      <td>${
-        r.status.toLowerCase() !== 'available'
-        ? `<button onclick="viewDetails(${r.room_id})" style="padding:5px 10px; background:#ffc107; border:none; border-radius:6px; cursor:pointer; font-weight:600;">View Details</button>`
-        : ""
-      }</td>
     `;
     tableBody.appendChild(tr);
-  });
+  }
 
   tableLabel.textContent = `${label} (${data.length})`;
 }
 
+// Chart helpers
 function getChartData(statusCounts) {
   const labels = [], data = [], colors = [];
   for (const [status, count] of Object.entries(statusCounts)) {
@@ -347,13 +362,14 @@ function initChart() {
     if (points.length) {
       const label = statusChart.data.labels[points[0].index].toLowerCase();
       currentFilter = label;
-      const filtered = rooms.filter(r => r.status.toLowerCase() === label);
+      let filtered = rooms.filter(r => r.status.toLowerCase() === label);
       renderTable(filtered, label.charAt(0).toUpperCase() + label.slice(1) + " Rooms");
       allRoomsBtn.style.display = "inline-block";
     }
   };
 }
 
+// Toggle buttons
 document.getElementById("RoomsBtn").addEventListener("click", function() {
   showRooms = !showRooms;
   statusChart.update();
@@ -369,6 +385,7 @@ allRoomsBtn.addEventListener("click", () => {
   allRoomsBtn.style.display = "none";
 });
 
+// Search functionality
 document.getElementById("searchBtn").addEventListener("click", function() {
   const inputs = document.querySelectorAll(".search-input");
   const rows = document.querySelectorAll("#roomTableBody tr");
@@ -387,10 +404,12 @@ document.getElementById("searchBtn").addEventListener("click", function() {
   });
 });
 
+// Back to top
 document.getElementById("backToTop").addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
+// Fetch rooms and update chart & table
 async function fetchDataAndUpdate() {
   try {
     const response = await fetch("fetch_analytics.php");
@@ -412,14 +431,17 @@ async function fetchDataAndUpdate() {
 
     totalRoomsDisplay.textContent = "Total Rooms: " + totalRooms;
 
+    // Show all rooms initially with guest info where applicable
     let filtered = rooms;
     if (currentFilter !== "all") {
       filtered = filtered.filter(r => r.status.toLowerCase() === currentFilter);
       allRoomsBtn.style.display = "inline-block";
+      renderTable(filtered, currentFilter.charAt(0).toUpperCase() + currentFilter.slice(1) + " Rooms");
     } else {
-      allRoomsBtn.style.display = "none";
+      allRoomsBtn.style.display = "inline-block"; // show immediately
+      renderTable(filtered, "Room Details");
     }
-    renderTable(filtered, currentFilter === "all" ? "Room Details" : currentFilter.charAt(0).toUpperCase() + currentFilter.slice(1) + " Rooms");
+
   } catch (err) {
     console.error("Error fetching rooms:", err);
   }
@@ -427,10 +449,6 @@ async function fetchDataAndUpdate() {
 
 setInterval(fetchDataAndUpdate, 5000);
 fetchDataAndUpdate();
-
-function viewDetails(roomId) {
-  alert("Viewing details for Room ID: " + roomId);
-}
 </script>
 
 </body>
