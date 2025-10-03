@@ -20,6 +20,7 @@ CREATE TABLE `inventory` (
   `item_id` int(11) NOT NULL,
   `item_name` varchar(255) NOT NULL,
   `category` varchar(100) DEFAULT NULL,
+  `unit` varchar(50) DEFAULT NULL,
   `quantity_in_stock` int(11) NOT NULL DEFAULT 0,
   `used_qty` int(11) DEFAULT 0,
   `wasted_qty` int(11) DEFAULT 0,

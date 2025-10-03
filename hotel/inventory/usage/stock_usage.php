@@ -54,7 +54,7 @@ if ($search_user) {
 $where_sql = $where ? "WHERE " . implode(" AND ", $where) : "";
 
 $usage_logs_stmt = $pdo->prepare("
-    SELECT su.usage_id, i.item_name, su.used_qty, su.used_by, su.date_used
+    SELECT su.usage_id, i.item_name, i.unit, su.used_qty, su.used_by, su.date_used
     FROM stock_usage su
     JOIN inventory i ON su.item_id = i.item_id
     $where_sql
@@ -112,6 +112,7 @@ $recent_text = $recent_deductions ? implode(", ", array_slice($recent_deductions
       <tr>
         <th>Item Name</th>
         <th>Quantity Used</th>
+        <th>Unit</th>
         <th>Used By</th>
         <th>Date Used</th>
         <th>Actions</th>
@@ -123,10 +124,11 @@ $recent_text = $recent_deductions ? implode(", ", array_slice($recent_deductions
         <tr>
           <td><?= htmlspecialchars($log['item_name']) ?></td>
           <td><?= (int)$log['used_qty'] ?></td>
+          <td><?= htmlspecialchars($log['unit'] ?? '-') ?></td>
           <td><?= htmlspecialchars($log['used_by']) ?></td>
           <td><?= date('M j, Y g:i A', strtotime($log['date_used'])) ?></td>
           <td class="actions">
-            <a href="stock_usage.php?delete_id=<?= (int)$log['usage_id'] ?>&token=<?= $_SESSION['csrf_token'] ?>" 
+            <a href="stock_usage.php?delete_id=<?= (int)$log['usage_id'] ?>&token=<?= $_SESSION['csrf_token'] ?>"
                class="delete-btn"
                onclick="return confirm('Are you sure you want to delete this usage log?\n\nThis will restore <?= (int)$log['used_qty'] ?> units of <?= htmlspecialchars($log['item_name']) ?> to inventory.');">
               <i class="fas fa-trash"></i> Delete
@@ -136,7 +138,7 @@ $recent_text = $recent_deductions ? implode(", ", array_slice($recent_deductions
         <?php endforeach; ?>
       <?php else: ?>
         <tr>
-          <td colspan="5" style="text-align: center; color: #666; font-style: italic;">
+          <td colspan="6" style="text-align: center; color: #666; font-style: italic;">
             <?php if ($search_item || $search_user): ?>
               No usage logs found matching your search criteria.<br>
               <a href="stock_usage.php" style="color: #3498db;">Clear search to see all logs</a>

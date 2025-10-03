@@ -24,10 +24,11 @@ if ($search_category) {
 $where = $conditions ? "WHERE " . implode(" AND ", $conditions) : "";
 
 $query = "
-    SELECT 
+    SELECT
         i.item_id,
         i.item_name,
         i.category,
+        i.unit,
         SUM(COALESCE(i.quantity_in_stock,0)) AS quantity_in_stock,
         SUM(COALESCE(i.used_qty,0)) AS used_qty,
         SUM(COALESCE(i.wasted_qty,0)) AS wasted_qty,
@@ -36,7 +37,7 @@ $query = "
         GROUP_CONCAT(DISTINCT NULLIF(TRIM(i.inspected_by), '') SEPARATOR ', ') AS inspected_by
     FROM inventory i
     $where
-    GROUP BY i.item_id, i.item_name, i.category
+    GROUP BY i.item_id, i.item_name, i.category, i.unit
     ORDER BY i.item_id DESC
 ";
 
@@ -311,6 +312,7 @@ setInterval(() => {
           <th>Item ID</th>
           <th>Item Name</th>
           <th>Category</th>
+          <th>Unit</th>
           <th>Total Quantity</th>
           <th>Used Quantity</th>
           <th>Wasted Quantity</th>
@@ -335,6 +337,7 @@ setInterval(() => {
           <td data-label="Item ID"><?= htmlspecialchars($item['item_id']) ?></td>
           <td data-label="Item Name"><?= htmlspecialchars($item['item_name']) ?></td>
           <td data-label="Category"><?= htmlspecialchars($category) ?></td>
+          <td data-label="Unit"><?= htmlspecialchars($item['unit'] ?? '-') ?></td>
           <td data-label="Total Quantity" class="<?= $qtyClass ?>"><?= $qty ?></td>
           <td data-label="Used Quantity"><?= $used_qty ?></td>
           <td data-label="Wasted Quantity"><?= $wasted_qty ?></td>
