@@ -1,14 +1,15 @@
 <?php
 namespace CRM\Lib;
 
-class Guest {
+class Complaint {
+    public ?int $id = null;
     public ?int $guest_id = null;
-    public string $first_name = '';
-    public string $last_name = '';
-    public string $email = '';
-    public string $first_phone = '';
-    public ?string $second_phone = null;
-    public string $status = 'active';
+    public string $guest_name = '';
+    public string $comment = '';
+    public string $type = 'complaint';
+    public ?int $rating = null;
+    public string $status = 'pending';
+    public ?string $reply = null;
     public ?string $created_at = null;
     public ?string $updated_at = null;
 
@@ -20,13 +21,14 @@ class Guest {
 
     public function toArray(): array {
         return [
+            'id' => $this->id,
             'guest_id' => $this->guest_id,
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'email' => $this->email,
-            'first_phone' => $this->first_phone,
-            'second_phone' => $this->second_phone,
+            'guest_name' => $this->guest_name,
+            'comment' => $this->comment,
+            'type' => $this->type,
+            'rating' => $this->rating,
             'status' => $this->status,
+            'reply' => $this->reply,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];

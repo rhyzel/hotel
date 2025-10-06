@@ -17,7 +17,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="overlay">
+
     <nav class="sidebar" role="navigation" aria-label="Main navigation">
       <div class="sidebar-header">
         <div class="logo">
@@ -95,35 +95,26 @@
             <h3>0.0</h3>
             <p>Avg Rating</p>
           </div>
-      <div class="stat-card"id="stat-total-complaints">
-      <div class="stat-header">
-        <div class="stat-icon red">⚠️</div>
-      </div>
-      <h3>0</h3>
-      <p>Total Complaints</p>
-    </div>
+          <div class="stat-card" id="stat-resolved-complaints">
+            <div class="stat-header">
+              <div class="stat-icon green">✅</div>
+            </div>
+            <h3>0</h3>
+            <p>Resolved Complaints</p>
+          </div>
         </div>
         <div class="chart-grid">
           <div class="chart-card">
-            <div class="chart-header">
-              <h3>Guest Trends</h3>
-              <span class="icon">📈</span>
-            </div>
-            <canvas id="guestChart" aria-label="Guest trends chart" role="img"></canvas>
+            <canvas id="guestChart"></canvas>
           </div>
-
           <div class="chart-card">
-            <div class="chart-header">
-              <h3>Loyalty Distribution</h3>
-              <span class="icon">🏆</span>
-            </div>
-            <canvas id="loyaltyChart" aria-label="Loyalty distribution chart" role="img"></canvas>
+            <canvas id="loyaltyChart"></canvas>
           </div>
         </div>
       </section>
 
       <!-- GUESTS -->
-      <section id="guests" class="section" aria-labelledby="guests-heading" hidden>
+      <section id="guests" class="section" aria-labelledby="guests-heading">
         <div class="section-header">
           <div class="header-text">
             <h1 id="guests-heading">Guest Management</h1>
@@ -145,7 +136,7 @@
       </section>
 
       <!-- LOYALTY -->
-      <section id="loyalty" class="section" aria-labelledby="loyalty-heading" hidden>
+      <section id="loyalty" class="section" aria-labelledby="loyalty-heading">
         <div class="section-header">
           <div class="header-text">
             <h1 id="loyalty-heading">Loyalty Programs</h1>
@@ -183,7 +174,7 @@
             <div class="stat-header">
               <div class="stat-icon orange">📈</div>
             </div>
-            <h3 id="statRevenueImpact">$0</h3>
+            <h3 id="statRevenueImpact">₱0</h3>
             <p>Revenue Impact</p>
           </div>
         </div>
@@ -192,7 +183,7 @@
       </section>
 
       <!-- CAMPAIGNS -->
-      <section id="campaigns" class="section" aria-labelledby="campaigns-heading" hidden>
+      <section id="campaigns" class="section" aria-labelledby="campaigns-heading">
         <div class="section-header">
           <div class="header-text">
             <h1 id="campaigns-heading">Marketing Campaigns</h1>
@@ -239,7 +230,7 @@
       </section>
 
       <!-- FEEDBACK -->
-      <section id="feedback" class="section" aria-labelledby="feedback-heading" hidden>
+      <section id="feedback" class="section" aria-labelledby="feedback-heading">
         <div class="section-header">
           <div class="header-text">
             <h1 id="feedback-heading">Guest Feedback</h1>
@@ -267,14 +258,6 @@
 
           <div class="stat-card">
             <div class="stat-header">
-              <div class="stat-icon red">⚠️</div>
-            </div>
-            <h3 id="statServiceFeedback">0</h3>
-            <p>Service Feedback</p>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-header">
               <div class="stat-icon green">✅</div>
             </div>
             <h3 id="statResolutionRate">0%</h3>
@@ -289,41 +272,21 @@
           <button onclick="showFeedbackType('review')" class="tab-btn">
             Reviews 
           </button>
-          <button onclick="showFeedbackType('service_feedback')" class="tab-btn">
-            Service Feedback 
-          </button>
         </div>
 
         <div id="feedbackList" class="feedback-list" aria-live="polite"></div>
       </section>
 
       <!-- COMPLAINTS -->
-      <section id="complaints" class="section" aria-labelledby="complaints-heading" hidden>
+      <section id="complaints" class="section" aria-labelledby="complaints-heading">
         <div class="section-header">
           <div class="header-text">
             <h1 id="complaints-heading">Guest Complaints</h1>
             <p>Manage and resolve guest complaints.</p>
           </div>
-          <button class="btn btn-primary" onclick="showCreateComplaintModal()">➕ Add Complaint</button>
         </div>
 
         <div class="stats-grid" id="complaints-stats">
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-icon yellow">💡</div>
-            </div>
-            <h3 id="statSuggestions">0</h3>
-            <p>Total Suggestions</p>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-icon purple">🎉</div>
-            </div>
-            <h3 id="statCompliments">0</h3>
-            <p>Total Compliments</p>
-          </div>
-
           <div class="stat-card">
             <div class="stat-header">
               <div class="stat-icon red">⚠️</div>
@@ -348,12 +311,7 @@
           <button onclick="showComplaintType('complaint')" class="tab-btn">
             Complaints
           </button>
-          <button onclick="showComplaintType('compliment')" class="tab-btn">
-            Compliments
-          </button>
-          <button onclick="showComplaintType('suggestion')" class="tab-btn">
-            Suggestions
-          </button>
+
         </div>
 
         <div id="complaintsList" class="feedback-list" aria-live="polite"></div>
@@ -369,36 +327,28 @@
   <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="addGuestTitle">
     <h3 id="addGuestTitle">Add New Guest</h3>
     <form id="addGuestForm" onsubmit="addGuest(event)">
-      <label for="guestName">Full Name *</label>
-      <input type="text" id="guestName" placeholder="Enter full name" required />
+      <label>First Name *</label>
+      <input type="text" id="guestFirstName" placeholder="First name" required>
+
+      <label>Last Name *</label>
+      <input type="text" id="guestLastName" placeholder="Last name" required>
 
       <label for="guestEmail">Email Address *</label>
       <input type="email" id="guestEmail" placeholder="Enter email address" required />
 
-      <label for="guestPhone">Phone Number *</label>
-      <input type="tel" id="guestPhone" placeholder="Enter phone number" required />
 
-      <label for="guestLocation">Location</label>
-      <input type="text" id="guestLocation" placeholder="Enter location (city, country)" />
+      <label for="guestFirstPhone">First Phone Number *</label>
+      <input type="text" id="guestFirstPhone" placeholder="Enter primary phone number" required />
 
-      <label for="guestLoyalty">Loyalty Tier *</label>
-      <select id="guestLoyalty" required>
-        <option value="">Select Loyalty Tier</option>
-        <option value="bronze">Bronze</option>
-        <option value="silver">Silver</option>
-        <option value="gold">Gold</option>
-        <option value="platinum">Platinum</option>
-      </select>
-        <label for="status">Status:</label>
-        <select id="status" name="status">
-            <option value="regular">Regular</option>
-            <option value="vip">VIP</option>
-            <option value="banned">Banned</option>
-        </select>
-        <p id="statusMessage"></p>
+      <label for="guestSecondPhone">Second Phone Number</label>
+      <input type="text" id="guestSecondPhone" placeholder="Enter secondary phone number (optional)" />
 
-      <label for="guestNotes">Notes & Preferences</label>
-      <textarea id="guestNotes" placeholder="Add any preferences, notes, or special requirements..." rows="3"></textarea>
+    <label for="guestStatus">Status</label>
+    <select id="guestStatus" name="status">
+      <option value="active" selected>Active</option>
+      <option value="vip">VIP</option>
+      <option value="banned">Banned</option>
+    </select>
 
       <div class="modal-actions">
         <button type="button" onclick="closeModal('addGuestModal')" class="btn-secondary">Cancel</button>
@@ -408,49 +358,40 @@
   </div>
 </div>
 
-<!-- Edit Guest Modal -->
-<div id="editGuestModal" class="modal" aria-hidden="true">
-  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="editGuestTitle">
-    <h3 id="editGuestTitle">Edit Guest Information</h3>
-    <form id="editGuestForm" onsubmit="updateGuest(event)">
-      <label for="editGuestName">Full Name *</label>
-      <input type="text" id="editGuestName" placeholder="Enter full name" required />
+<!-- View Guest Modal -->
+<div id="viewGuestModal" class="modal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="viewGuestTitle">
+    <h3 id="viewGuestTitle">View Guest Information</h3>
+    <form id="viewGuestForm">
+      <label for="viewGuestFirstName">First Name *</label>
+      <input type="text" id="viewGuestFirstName" placeholder="Enter first name" readonly />
 
-      <label for="editGuestEmail">Email Address *</label>
-      <input type="email" id="editGuestEmail" placeholder="Enter email address" required />
+      <label for="viewGuestLastName">Last Name *</label>
+      <input type="text" id="viewGuestLastName" placeholder="Enter last name" readonly />
 
-      <label for="editGuestPhone">Phone Number *</label>
-      <input type="tel" id="editGuestPhone" placeholder="Enter phone number" required />
+      <label for="viewGuestEmail">Email Address *</label>
+      <input type="email" id="viewGuestEmail" placeholder="Enter email address" readonly/>
 
-      <label for="editGuestLocation">Location</label>
-      <input type="text" id="editGuestLocation" placeholder="Enter location (city, country)" />
+      <label for="viewGuestFirstPhone">First Phone Number *</label>
+      <input type="tel" id="viewGuestFirstPhone" placeholder="Enter primary phone number" readonly />
 
-      <label for="editGuestLoyalty">Loyalty Tier *</label>
-      <select id="editGuestLoyalty" required>
-        <option value="">Select Loyalty Tier</option>
-        <option value="bronze">Bronze</option>
-        <option value="silver">Silver</option>
-        <option value="gold">Gold</option>
-        <option value="platinum">Platinum</option>
+      <label for="viewGuestSecondPhone">Second Phone Number</label>
+      <input type="tel" id="viewGuestSecondPhone" placeholder="Enter secondary phone number (optional)" readonly/>
+
+      <label for="viewGuestStatus">Status</label>
+      <select id="viewGuestStatus" name="status" disabled>
+        <option value="active">Active</option>
+        <option value="vip">VIP</option>
+        <option value="banned">Banned</option>
       </select>
-        <label for="status">Status:</label>
-        <select id="status" name="status">
-            <option value="regular">Regular</option>
-            <option value="vip">VIP</option>
-            <option value="banned">Banned</option>
-        </select>
-        <p id="statusMessage"></p>
-
-      <label for="editGuestNotes">Notes & Preferences</label>
-      <textarea id="editGuestNotes" placeholder="Add any preferences, notes, or special requirements..." rows="3"></textarea>
 
       <div class="modal-actions">
-        <button type="button" onclick="closeModal('editGuestModal')" class="btn-secondary">Cancel</button>
-        <button type="submit" class="btn-primary">Save Changes</button>
+        <button type="button" onclick="closeModal('viewGuestModal')" class="btn-secondary">Close</button>
       </div>
     </form>
   </div>
 </div>
+
 
   <!-- Create Loyalty Program Modal -->
   <div id="createProgramModal" class="modal" aria-hidden="true">
@@ -464,13 +405,10 @@
         <label for="programTier">Loyalty Tier</label>
         <select id="programTier" required>
           <option value="">Select Tier</option>
-          <option value="bronze">Bronze</option>
-          <option value="silver">Silver</option>
-          <option value="gold">Gold</option>
-          <option value="platinum">Platinum</option>
+          <!-- JS will populate options dynamically from loyalty tiers -->
         </select>
 
-        <label for="programPointsRate">Points per $1 Spent</label>
+        <label for="programPointsRate">Points per ₱1 Spent</label>
         <input type="number" step="0.1" min="0.1" max="10" id="programPointsRate" placeholder="e.g., 1.5" required />
 
         <label for="programBenefits">Program Benefits</label>
@@ -521,18 +459,31 @@
         <label for="campaignAudience">Target Audience</label>
         <select id="campaignAudience" required>
           <option value="">Select Target Audience</option>
-          <option value="all">All Guests</option>
-          <option value="bronze">Bronze Members</option>
-          <option value="silver">Silver Members</option>
-          <option value="gold">Gold Members</option>
-          <option value="platinum">Platinum Members</option>
+            <option value="all">All Guests</option>
+  <option value="bronze">Bronze Members</option>
+  <option value="silver">Silver Members</option>
+  <option value="gold">Gold Members</option>
+  <option value="platinum">Platinum Members</option><!-- JS will populate options dynamically from loyalty tiers -->
         </select>
+          <button class="btn btn-primary" onclick="showCreateComplaintModal()">➕ Add Complaint</button>
 
         <label for="campaignMessage">Campaign Message</label>
         <textarea id="campaignMessage" placeholder="Enter your campaign message..." rows="4" required></textarea>
 
         <label for="campaignSchedule">Schedule (Optional)</label>
         <input type="datetime-local" id="campaignSchedule" />
+
+        <!-- Admin fields for campaign stats -->
+        <div id="campaignAdminFields" style="display:none;">
+          <label for="campaignSentCount">Sent Count</label>
+          <input type="number" id="campaignSentCount" min="0" value="0" />
+
+          <label for="campaignOpenRate">Open Rate (%)</label>
+          <input type="number" id="campaignOpenRate" min="0" max="100" step="0.1" value="0" />
+
+          <label for="campaignClickRate">Click Rate (%)</label>
+          <input type="number" id="campaignClickRate" min="0" max="100" step="0.1" value="0" />
+        </div>
 
         <div id="campaignExtraStats" style="display:none; margin-top:10px; color:white;">
           <p id="viewCampaignStatus"></p>
@@ -564,8 +515,6 @@
         <label for="editComplaintType">Type</label>
         <select id="editComplaintType">
           <option value="complaint">Complaint</option>
-          <option value="suggestion">Suggestion</option>
-          <option value="compliment">Compliment</option>
         </select>
 
         <label for="editComplaintRating">Rating (Optional)</label>
@@ -602,7 +551,7 @@
         <input type="text" id="complaintGuestName" placeholder="Enter guest name if not in list above" />
 
         <label for="complaintComment">Comment/Description</label>
-        <textarea id="complaintComment" placeholder="Describe the complaint, suggestion, or compliment..." rows="3" required></textarea>
+        <textarea id="complaintComment" placeholder="Describe the complaint..." rows="3" required></textarea>
 
         <label for="complaintStatus">Status</label>
         <select id="complaintStatus" required>
@@ -615,10 +564,7 @@
 
         <label for="complaintType">Type</label>
         <select id="complaintType" required>
-          <option value="">Select Type</option>
           <option value="complaint">Complaint</option>
-          <option value="suggestion">Suggestion</option>
-          <option value="compliment">Compliment</option>
         </select>
 
         <div class="modal-actions">

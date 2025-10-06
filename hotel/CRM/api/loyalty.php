@@ -25,6 +25,14 @@ try {
     respond(['success' => false, 'error' => 'Database connection failed: ' . $e->getMessage()], 500);
 }
 
+require_once __DIR__ . '/../bootstrap.php';
+use CRM\Lib\ApiDatabase as CRMDatabase;
+use CRM\Lib\LoyaltyProgramRepository;
+use CRM\Lib\LoyaltyProgramService;
+
+$loyaltyRepo = new LoyaltyProgramRepository($conn);
+$loyaltyService = new LoyaltyProgramService($loyaltyRepo);
+
 function respond($data, $code = 200) {
     http_response_code($code);
     echo json_encode($data);
@@ -34,6 +42,8 @@ function respond($data, $code = 200) {
 try {
     switch ($method) {
         case 'GET':
+            // Always sync before returning stats or programs
+            $loyaltyService->syncMembersCount();
             if (isset($_GET['stats'])) {
                 $current = [
                     'members' => (int)$conn->query("SELECT SUM(members_count) FROM loyalty_programs")->fetchColumn(),
@@ -53,46 +63,54 @@ try {
                 ]]);
             }
 
+            // Add: get lounge order points (optionally for a guest)
+            if (isset($_GET['lounge_points']) && $_GET['lounge_points'] == '1') {
+                $guest_id = isset($_GET['guest_id']) ? (int)$_GET['guest_id'] : null;
+                $points = $loyaltyService->getLoungeOrderPoints($guest_id);
+                respond(['success' => true, 'data' => ['points' => $points]]);
+            }
+
             $stmt = $conn->query("SELECT * FROM loyalty_programs");
             $programs = $stmt->fetchAll(PDO::FETCH_ASSOC);
             respond(['success' => true, 'data' => $programs]);
             break;
 
-case 'POST':
-    $input = json_decode(file_get_contents('php://input'), true) ?? [];
-    if (empty($input['name']) || empty($input['tier']) || !isset($input['points_rate'])) {
-        respond(['success' => false, 'error' => 'Missing required fields: name, tier, points_rate'], 400);
-    }
+        case 'POST':
+            $input = json_decode(file_get_contents('php://input'), true) ?? [];
+            if (empty($input['name']) || empty($input['tier']) || !isset($input['points_rate'])) {
+                respond(['success' => false, 'error' => 'Missing required fields: name, tier, points_rate'], 400);
+            }
 
-    // ✅ Check unique name
-    $checkStmt = $conn->prepare("SELECT COUNT(*) FROM loyalty_programs WHERE name = :name");
-    $checkStmt->execute([':name' => trim($input['name'])]);
-    if ($checkStmt->fetchColumn() > 0) {
-        respond(['success' => false, 'error' => 'A loyalty program with this name already exists.'], 400);
-    }
+            // ✅ Check unique name
+            $checkStmt = $conn->prepare("SELECT COUNT(*) FROM loyalty_programs WHERE name = :name");
+            $checkStmt->execute([':name' => trim($input['name'])]);
+            if ($checkStmt->fetchColumn() > 0) {
+                respond(['success' => false, 'error' => 'A loyalty program with this name already exists.'], 400);
+            }
 
-    $benefits = !empty($input['benefits'])
-        ? (is_array($input['benefits']) ? implode(',', $input['benefits']) : $input['benefits'])
-        : '';
+            $benefits = !empty($input['benefits'])
+                ? (is_array($input['benefits']) ? implode(',', $input['benefits']) : $input['benefits'])
+                : '';
 
-    $stmt = $conn->prepare("INSERT INTO loyalty_programs 
-        (name, tier, points_rate, benefits, members_count, description, status, created_at) 
-        VALUES (:name, :tier, :points_rate, :benefits, :members_count, :description, 'active', NOW())");
+            $stmt = $conn->prepare("INSERT INTO loyalty_programs 
+                (name, tier, points_rate, benefits, members_count, description, status, discount_rate, created_at) 
+                VALUES (:name, :tier, :points_rate, :benefits, :members_count, :description, 'active', :discount_rate, NOW())");
 
-    $stmt->execute([
-        ':name' => trim($input['name']),
-        ':tier' => strtolower(trim($input['tier'])),
-        ':points_rate' => floatval($input['points_rate']),
-        ':benefits' => $benefits,
-        ':members_count' => intval($input['members_count'] ?? 0),
-        ':description' => $input['description'] ?? ''
-    ]);
+            $stmt->execute([
+                ':name' => trim($input['name']),
+                ':tier' => strtolower(trim($input['tier'])),
+                ':points_rate' => floatval($input['points_rate']),
+                ':benefits' => $benefits,
+                ':members_count' => intval($input['members_count'] ?? 0),
+                ':description' => $input['description'] ?? '',
+                ':discount_rate' => isset($input['discount_rate']) ? floatval($input['discount_rate']) : 0.0
+            ]);
 
-$stmt = $conn->prepare("INSERT INTO loyalty_programs 
-  (name, tier, points_rate, benefits, description, members_count) 
-  VALUES (?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("ssdssi", $name, $tier, $points_rate, $benefits, $description, $members_count);
-    break;
+            $stmt = $conn->prepare("INSERT INTO loyalty_programs 
+              (name, tier, points_rate, benefits, description, members_count) 
+              VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssdssi", $name, $tier, $points_rate, $benefits, $description, $members_count);
+            break;
 
 
         case 'PUT':
@@ -121,6 +139,10 @@ $stmt->bind_param("ssdssi", $name, $tier, $points_rate, $benefits, $description,
             if (isset($input['status'])) {
                 $fields[] = "status = :status"; 
                 $params[':status'] = $input['status'];
+            }
+            if (isset($input['discount_rate'])) {
+                $fields[] = "discount_rate = :discount_rate";
+                $params[':discount_rate'] = floatval($input['discount_rate']);
             }
 
             if (!$fields) respond(['success' => false, 'error' => 'No fields to update'], 400);

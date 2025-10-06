@@ -1,32 +1,23 @@
 <?php
-// Database configuration
+require_once __DIR__ . '/../bootstrap.php';
+require_once __DIR__ . '/../lib/ApiDatabase.php';
+
+use CRM\Lib\ApiDatabase;
+
+// Backwards-compatible Database class wrapper (keeps procedural compatibility)
 class Database {
-    private $host = "localhost";
-    private $db_name = "hotel";
-    private $username = "root";
-    private $password = "";
-    private $conn;
+    private $db;
 
-    // Get database connection
+    public function __construct(array $config = []) {
+        $this->db = new ApiDatabase($config);
+    }
+
     public function getConnection() {
-        $this->conn = null;
-
-        try {
-            $this->conn = new PDO(
-                "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
-                $this->username,
-                $this->password
-            );
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch(PDOException $exception) {
-            echo "Connection error: " . $exception->getMessage();
-        }
-
-        return $this->conn;
+        return $this->db->getConnection();
     }
 }
 
-// Helper function to get database connection
+// Helper function to get database connection (unchanged API)
 function getDBConnection() {
     $database = new Database();
     return $database->getConnection();

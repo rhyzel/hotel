@@ -220,6 +220,9 @@ function updateStatCards(stats) {
   const complaintsGrowth = document.getElementById('growthComplaints');
   if (complaintsGrowth) setGrowthRateById('growthComplaints', calcGrowthRate(stats.total_complaints, stats.prev_total_complaints));
 
+  // Resolved Complaints (dashboard stat card)
+  const resolvedComplaintsH3 = document.querySelector('#stat-resolved-complaints h3');
+  if (resolvedComplaintsH3) resolvedComplaintsH3.textContent = stats.resolved_complaints ?? 0;
 }
 
 // Helper to calculate growth rate percentage
@@ -297,7 +300,7 @@ function initializeCharts(stats) {
       options: {
         responsive: true,
         plugins: {
-          legend: {
+          legend: { 
             position: 'bottom',
             labels: {
               color: '#fff',
@@ -337,49 +340,66 @@ function renderGuests() {
   }
 
   guests.forEach(guest => {
-    const avatarText = (guest.name || '').split(' ').map(n => n?.[0] || '').join('').toUpperCase() || 'G';
-    // Handle both guest_id and id fields from database
+    const avatarText = 'G';
     const guestId = guest.guest_id || guest.id;
-    
+    const historyTypeId = `purchaseType_${guestId}`;
+    // Improved actions row: flex, wrap, gap, rounded, shadow, hover
     const card = document.createElement('div');
     card.className = 'guest-card';
+    card.style.cssText = `
+      background: rgba(255,255,255,0.05);
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 18px;
+      padding: 18px 18px 12px 18px;
+      transition: box-shadow .2s;
+    `;
+    card.onmouseenter = () => { card.style.boxShadow = '0 6px 24px rgba(59,130,246,0.12)'; };
+    card.onmouseleave = () => { card.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)'; };
     card.innerHTML = `
-      <div class="guest-header">
-        <div class="guest-info">
-          <div class="guest-avatar">${avatarText}</div>
+      <div class="guest-header" style="margin-bottom:8px;">
+        <div class="guest-info" style="display:flex;align-items:center;gap:12px;">
+          <div class="guest-avatar" style="background:#3b82f6;color:white;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;">${avatarText}</div>
           <div>
-            <div class="guest-name">${escapeHtml(guest.name || '—')}</div>
-            <span class="loyalty-badge ${guest.loyalty_tier || ''}">${(guest.loyalty_tier || 'unknown').toUpperCase()}</span>
+            <span class="loyalty-badge ${guest.loyalty_tier || ''}" style="background:#fbbf24;color:#222;padding:2px 10px;border-radius:8px;font-size:12px;font-weight:600;">${(guest.loyalty_tier || 'unknown').toUpperCase()}</span>
           </div>
         </div>
       </div>
-      <div class="guest-details">
-        <div class="guest-detail"><span>📧</span><span>${escapeHtml(guest.email || '—')}</span></div>
-        <div class="guest-detail"><span>📞</span><span>${escapeHtml(guest.phone || '—')}</span></div>
-        <div class="guest-detail"><span>📍</span><span>${escapeHtml(guest.location || 'Unknown')}</span></div>
-        ${guest.notes ? `<div class="guest-detail"><span>📝</span><span>${escapeHtml(guest.notes)}</span></div>` : ''}
+      <div class="guest-details" style="margin-bottom:10px;">
+        <div class="guest-detail" style="color:#fff;font-size:14px;"><span>📧</span><span style="margin-left:6px;">${escapeHtml(guest.email || '—')}</span></div>
+        <div class="guest-detail" style="color:#fff;font-size:14px;"><span>📍</span><span style="margin-left:6px;">Unknown</span></div>
       </div>
-      <div class="guest-actions">
-        <button class="btn btn-secondary" onclick="editGuest(${guestId})" style="margin-right: 8px; padding: 8px 16px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer;">✏️ Edit</button>
-        <button class="btn btn-primary " onclick="deleteGuest(${guestId})" style="margin-right: 8px; padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">🗑️ Delete</button>
-      </div>`;
+      <div class="guest-actions"
+        style="display:flex;flex-wrap:wrap;gap:7px;align-items:center;overflow-x:auto;padding:4px 0;">
+        <button class="btn btn-secondary"
+          onclick="viewGuest(${guestId})"
+          style="padding:6px 14px;min-width:70px;border-radius:8px;font-size:13px;transition:.15s;background:#6b7280;color:#fff;border:none;cursor:pointer;">👁️ View</button>
+        <select id="${historyTypeId}" style="padding:5px 10px;border-radius:8px;min-width:90px;font-size:13px;border:1px solid #e5e7eb;background:#fff;">
+          <option value="lounge">Lounge</option>
+          <option value="giftshop">Giftshop</option>
+          <option value="room_dining">Room Dining</option>
+          <option value="restaurant">Restaurant</option>
+          <option value="all">All</option>
+        </select>
+        <button class="btn btn-primary"
+          onclick="showPurchaseHistoryWithType(${guestId})"
+          style="padding:6px 14px;min-width:110px;border-radius:8px;font-size:13px;transition:.15s;background:#f59e0b;color:#fff;border:none;cursor:pointer;">🛒 History</button>
+        <button class="btn btn-primary"
+          onclick="deleteGuest(${guestId})"
+          style="padding:6px 14px;min-width:70px;border-radius:8px;font-size:13px;transition:.15s;background:#ef4444;color:#fff;border:none;cursor:pointer;">🗑️ Delete</button>
+      </div>
+    `;
     list.appendChild(card);
   });
 }
 
-async function filterGuests() {
-  const term = document.getElementById('guestSearch')?.value.trim() || '';
-  try {
-    const res = await apiRequest(`guests.php?search=${encodeURIComponent(term)}`);
-    guests = res?.data || [];
-    renderGuests();
-    await loadGuestOptions();
-    showNotification(`Found ${guests.length} guests`);
-  } catch (e) { 
-    console.error('Filter guests error:', e);
-    showNotification('Failed to filter guests', 'error');
-  }
+// Helper to get selected type and call showPurchaseHistory
+function showPurchaseHistoryWithType(guestId) {
+  const sel = document.getElementById(`purchaseType_${guestId}`);
+  const type = sel ? sel.value : 'lounge';
+  showPurchaseHistory(guestId, type);
 }
+
 
 /* --------------------------
    Add Guest Modal & Functions
@@ -409,42 +429,38 @@ async function addGuest(event) {
   
   // Get form data
   const guestData = {
-    name: document.getElementById('guestName')?.value.trim() || '',
+    first_name: document.getElementById('guestFirstName')?.value.trim() || '',
+    last_name: document.getElementById('guestLastName')?.value.trim() || '',
     email: document.getElementById('guestEmail')?.value.trim() || '',
-    phone: document.getElementById('guestPhone')?.value.trim() || '',
-    loyalty_tier: document.getElementById('guestLoyalty')?.value || '',
-    location: document.getElementById('guestLocation')?.value.trim() || 'Unknown',
-    notes: document.getElementById('guestNotes')?.value.trim() || ''
+    first_phone: document.getElementById('guestFirstPhone')?.value.trim() || '',
+    second_phone: document.getElementById('guestSecondPhone')?.value.trim() || '',
+    status: 'active'
   };
-  
+
   // Validation
-  if (!guestData.name) {
-    showNotification('Full name is required', 'error');
-    document.getElementById('guestName')?.focus();
+  if (!guestData.first_name) {
+    showNotification('First name is required', 'error');
+    document.getElementById('guestFirstName')?.focus();
     return;
   }
-  
+  if (!guestData.last_name) {
+    showNotification('Last name is required', 'error');
+    document.getElementById('guestLastName')?.focus();
+    return;
+  }
   if (!guestData.email) {
     showNotification('Email address is required', 'error');
     document.getElementById('guestEmail')?.focus();
     return;
   }
-  
   if (!isValidEmail(guestData.email)) {
     showNotification('Please enter a valid email address', 'error');
     document.getElementById('guestEmail')?.focus();
     return;
   }
-  
-  if (!guestData.phone) {
-    showNotification('Phone number is required', 'error');
-    document.getElementById('guestPhone')?.focus();
-    return;
-  }
-  
-  if (!guestData.loyalty_tier) {
-    showNotification('Please select a loyalty tier', 'error');
-    document.getElementById('guestLoyalty')?.focus();
+  if (!guestData.first_phone) {
+    showNotification('First phone is required', 'error');
+    document.getElementById('guestFirstPhone')?.focus();
     return;
   }
 
@@ -465,112 +481,42 @@ async function addGuest(event) {
 }
 
 /* --------------------------
-   Edit Guest Modal & Functions
+   View Guest Modal & Functions
 ---------------------------*/
 
-function editGuest(id) {
+function viewGuest(id) {
   // Find guest using flexible ID matching
   const guest = guests.find(g => {
     const guestId = g.guest_id || g.id;
     return Number(guestId) === Number(id);
   });
-  
+
   if (!guest) {
     console.error('Guest not found with ID:', id);
     showNotification('Guest not found', 'error');
     return;
   }
-  
-  // Store the ID for updating
-  editingGuestId = id;
-  
-  // Populate form fields
-  document.getElementById('editGuestName').value = guest.name || '';
-  document.getElementById('editGuestEmail').value = guest.email || '';
-  document.getElementById('editGuestPhone').value = guest.phone || '';
-  document.getElementById('editGuestLoyalty').value = guest.loyalty_tier || '';
-  document.getElementById('editGuestLocation').value = guest.location || '';
-  document.getElementById('editGuestNotes').value = guest.notes || '';
-  
+
+  // Populate form fields (readonly)
+  document.getElementById('viewGuestFirstName').value = guest.first_name || '';
+  document.getElementById('viewGuestLastName').value = guest.last_name || '';
+  document.getElementById('viewGuestEmail').value = guest.email || '';
+  document.getElementById('viewGuestFirstPhone').value = guest.first_phone || '';
+  document.getElementById('viewGuestSecondPhone').value = guest.second_phone || '';
+  document.getElementById('viewGuestStatus').value = guest.status || 'active';
+
   // Show modal
-  const modal = document.getElementById('editGuestModal');
+  const modal = document.getElementById('viewGuestModal');
   if (modal) {
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
   }
-  
+
   // Focus on first input
   setTimeout(() => {
-    const firstInput = document.getElementById('editGuestName');
+    const firstInput = document.getElementById('viewGuestFirstName');
     if (firstInput) firstInput.focus();
   }, 100);
-}
-
-async function updateGuest(event) {
-  event.preventDefault();
-  
-  if (!editingGuestId) {
-    showNotification('No guest selected for editing', 'error');
-    return;
-  }
-  
-  // Get form data
-  const data = {
-    id: editingGuestId,
-    name: document.getElementById('editGuestName')?.value.trim() || '',
-    email: document.getElementById('editGuestEmail')?.value.trim() || '',
-    phone: document.getElementById('editGuestPhone')?.value.trim() || '',
-    loyalty_tier: document.getElementById('editGuestLoyalty')?.value || '',
-    location: document.getElementById('editGuestLocation')?.value.trim() || 'Unknown',
-    notes: document.getElementById('editGuestNotes')?.value.trim() || ''
-  };
-  
-  // Validation
-  if (!data.name) {
-    showNotification('Full name is required', 'error');
-    document.getElementById('editGuestName')?.focus();
-    return;
-  }
-  
-  if (!data.email) {
-    showNotification('Email address is required', 'error');
-    document.getElementById('editGuestEmail')?.focus();
-    return;
-  }
-  
-  if (!isValidEmail(data.email)) {
-    showNotification('Please enter a valid email address', 'error');
-    document.getElementById('editGuestEmail')?.focus();
-    return;
-  }
-  
-  if (!data.phone) {
-    showNotification('Phone number is required', 'error');
-    document.getElementById('editGuestPhone')?.focus();
-    return;
-  }
-  
-  if (!data.loyalty_tier) {
-    showNotification('Please select a loyalty tier', 'error');
-    document.getElementById('editGuestLoyalty')?.focus();
-    return;
-  }
-  
-  try {
-    const response = await apiRequest('guests.php', 'PUT', data);
-    
-    if (response.success) {
-      await loadGuests();
-      closeModal('editGuestModal');
-      editingGuestId = null;
-      showNotification('Guest updated successfully!');
-    } else {
-      throw new Error(response.error || 'Failed to update guest');
-    }
-  } catch (e) { 
-    console.error('Update guest error:', e);
-    showNotification(e.message || 'Failed to update guest', 'error');
-  }
 }
 
 /* --------------------------
@@ -619,10 +565,9 @@ function closeModal(modalId) {
   if (modalId === 'addGuestModal') {
     const form = document.getElementById('addGuestForm');
     if (form) form.reset();
-  } else if (modalId === 'editGuestModal') {
-    const form = document.getElementById('editGuestForm');
+  } else if (modalId === 'viewGuestModal') {
+    const form = document.getElementById('viewGuestForm');
     if (form) form.reset();
-    editingGuestId = null;
   }
 }
 
@@ -643,6 +588,123 @@ document.addEventListener('keydown', function(event) {
     }
   }
 });
+
+// --- Lounge Order History Modal ---
+async function showPurchaseHistory(guestId, type = 'lounge') {
+  try {
+    // Fetch purchase history from API
+    let endpoint = `guests.php?guest_id=${guestId}&history_type=${type}`;
+    const res = await apiRequest(endpoint);
+    let orders = res.data;
+
+    let html = '';
+    if (type === 'all') {
+      // Show all types
+      html = Object.entries(orders).map(([key, arr]) => {
+        let label = {
+          lounge: 'Lounge Orders',
+          giftshop: 'Giftshop Sales',
+          room_dining: 'Room Dining Orders',
+          restaurant: 'Restaurant Orders'
+        }[key] || key;
+        return `
+          <h4 style="color:#fbbf24;margin-top:24px;">${label}</h4>
+          ${arr.length === 0 ? '<p style="color:white;">No records found.</p>' : `
+            <table style="width:100%;color:white;border-collapse:collapse;margin-bottom:16px;">
+              <thead>
+                <tr>
+                  <th style="border-bottom:1px solid #fff;padding:6px;">Order/Sale #</th>
+                  <th style="border-bottom:1px solid #fff;padding:6px;">Type</th>
+                  <th style="border-bottom:1px solid #fff;padding:6px;">Total</th>
+                  <th style="border-bottom:1px solid #fff;padding:6px;">Date</th>
+                  <th style="border-bottom:1px solid #fff;padding:6px;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${arr.map(o => `
+                  <tr>
+                    <td style="padding:6px;">${o.order_id || o.sale_id}</td>
+                    <td style="padding:6px;">${escapeHtml(o.order_type || o.payment_method || '-')}</td>
+                    <td style="padding:6px;">₱${Number(o.total_amount).toFixed(2)}</td>
+                    <td style="padding:6px;">${o.order_date || o.sale_date ? new Date(o.order_date || o.sale_date).toLocaleString() : '-'}</td>
+                    <td style="padding:6px;">${escapeHtml(o.status || '-')}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `}
+        `;
+      }).join('');
+    } else {
+      // Single type
+      if (!orders.length) {
+        html = '<p style="color:white;text-align:center;padding:24px;">No purchase history found for this guest.</p>';
+      } else {
+        html = `
+          <table style="width:100%;color:white;border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="border-bottom:1px solid #fff;padding:6px;">Order/Sale #</th>
+                <th style="border-bottom:1px solid #fff;padding:6px;">Type</th>
+                <th style="border-bottom:1px solid #fff;padding:6px;">Total</th>
+                <th style="border-bottom:1px solid #fff;padding:6px;">Date</th>
+                <th style="border-bottom:1px solid #fff;padding:6px;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${orders.map(o => `
+                <tr>
+                  <td style="padding:6px;">${o.order_id || o.sale_id}</td>
+                  <td style="padding:6px;">${escapeHtml(o.order_type || o.payment_method || '-')}</td>
+                  <td style="padding:6px;">₱${Number(o.total_amount).toFixed(2)}</td>
+                  <td style="padding:6px;">${o.order_date || o.sale_date ? new Date(o.order_date || o.sale_date).toLocaleString() : '-'}</td>
+                  <td style="padding:6px;">${escapeHtml(o.status || '-')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+    }
+
+    showPurchaseHistoryModal(html);
+  } catch (e) {
+    showPurchaseHistoryModal('<p style="color:white;text-align:center;padding:24px;">Failed to load purchase history.</p>');
+  }
+}
+
+function showPurchaseHistoryModal(contentHtml) {
+  let modal = document.getElementById('purchaseHistoryModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'purchaseHistoryModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+      <div class="modal-content" style="max-width:700px;" role="dialog" aria-modal="true" aria-labelledby="purchaseHistoryTitle">
+        <h3 id="purchaseHistoryTitle"></h3>
+        <div id="purchaseHistoryContent"></div>
+        <div class="modal-actions">
+          <button type="button" onclick="closeModal('purchaseHistoryModal')" class="btn-secondary">Close</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+  // Set the modal title based on the selected type
+  let type = 'lounge'; // default
+  const lastSel = document.querySelector('[id^="purchaseType_"]');
+  if (lastSel) type = lastSel.value;
+  let title = 'Purchase History';
+  if (type === 'giftshop') title = 'Giftshop Purchase History';
+  else if (type === 'room_dining') title = 'Room Dining Purchase History';
+  else if (type === 'restaurant') title = 'Restaurant Purchase History';
+  else if (type === 'lounge') title = 'Lounge Purchase History';
+  else if (type === 'all') title = 'All Purchase History';
+  document.getElementById('purchaseHistoryTitle').textContent = title;
+  document.getElementById('purchaseHistoryContent').innerHTML = contentHtml;
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
+}
 
 /* --------------------------
    Helper Functions
@@ -686,9 +748,28 @@ async function loadGuestOptions() {
       const opt = document.createElement('option');
       const guestId = g.guest_id || g.id;
       opt.value = guestId;
-      opt.textContent = `${g.name} (${g.email || 'no email'})`;
+      // Add guest profile info as data attributes
+      opt.textContent = `${g.first_name || ''} ${g.last_name || ''} (${g.email || 'no email'})`;
+      opt.setAttribute('data-profile', JSON.stringify({
+        guest_id: guestId,
+        first_name: g.first_name || '',
+        last_name: g.last_name || '',
+        email: g.email || '',
+        status: g.status || '',
+        loyalty_tier: g.loyalty_tier || ''
+      }));
       select.appendChild(opt);
     });
+
+    // Optional: On change, show guest profile info somewhere in the form
+    select.onchange = function() {
+      const selected = select.options[select.selectedIndex];
+      const profile = selected.getAttribute('data-profile');
+      if (profile) {
+        // You can parse and display this profile info in your complaint modal as needed
+        // Example: console.log(JSON.parse(profile));
+      }
+    };
   } catch (err) {
     console.error('Failed to load guests for complaint select:', err);
   }
@@ -794,15 +875,15 @@ function updateCampaignStats() {
 function showCreateCampaignModal() {
   document.getElementById('createCampaignForm')?.reset();
   editingCampaignId = null;
-
   document.getElementById('createCampaignTitle').textContent = "Create New Campaign";
   document.getElementById('campaignSaveBtn').style.display = "inline-block";
   document.getElementById('campaignCancelBtn').textContent = "Cancel";
   document.getElementById('campaignExtraStats').style.display = "none";
-
+  document.getElementById('campaignAdminFields').style.display = "block";
   toggleCampaignFields(true);
-
   document.getElementById('createCampaignModal')?.classList.add('active');
+  // Add this line:
+  populateCampaignAudienceTiers();
 }
 
 function editCampaign(id) {
@@ -823,10 +904,17 @@ function editCampaign(id) {
 
   document.getElementById('campaignSchedule').value = c.schedule || '';
 
+  // Populate admin fields for edit
+  document.getElementById('campaignSentCount').value = c.sent_count || 0;
+  document.getElementById('campaignOpenRate').value = c.open_rate || 0;
+  document.getElementById('campaignClickRate').value = c.click_rate || 0;
+
   document.getElementById('createCampaignTitle').textContent = "Edit Campaign";
   document.getElementById('campaignSaveBtn').style.display = "inline-block";
   document.getElementById('campaignCancelBtn').textContent = "Cancel";
   document.getElementById('campaignExtraStats').style.display = "none";
+
+  document.getElementById('campaignAdminFields').style.display = "block";
 
   toggleCampaignFields(true);
   document.getElementById('createCampaignModal')?.classList.add('active');
@@ -834,7 +922,7 @@ function editCampaign(id) {
 
 async function createCampaign(e) {
   e?.preventDefault();
-  
+
   const data = {
     name: document.getElementById('campaignName')?.value.trim() || '',
     description: document.getElementById('campaignDescription')?.value.trim() || '',
@@ -842,7 +930,10 @@ async function createCampaign(e) {
     target_audience: document.getElementById('campaignAudience')?.value || '',
     message: document.getElementById('campaignMessage')?.value.trim() || '',
     status: document.getElementById('campaignStatus')?.value || 'draft',
-    schedule: document.getElementById('campaignSchedule')?.value || null
+    schedule: document.getElementById('campaignSchedule')?.value || null,
+    sent_count: Number(document.getElementById('campaignSentCount')?.value) || 0,
+    open_rate: Number(document.getElementById('campaignOpenRate')?.value) || 0,
+    click_rate: Number(document.getElementById('campaignClickRate')?.value) || 0
   };
 
   const validStatuses = ['draft','scheduled','active','completed'];
@@ -868,21 +959,10 @@ async function createCampaign(e) {
     await loadCampaigns();
     closeModal('createCampaignModal');
     document.getElementById('createCampaignForm')?.reset();
-    
+    document.getElementById('campaignAdminFields').style.display = "none";
   } catch (err) {
     console.error(err);
     showNotification('Failed to save campaign', 'error');
-  }
-}
-
-async function deleteCampaign(id) {
-  if (!confirm('Are you sure you want to delete this campaign?')) return;
-  try {
-    await apiRequest('campaigns.php', 'DELETE', { id });
-    await loadCampaigns();
-    showNotification('Campaign deleted successfully!');
-  } catch (e) { 
-    console.error(e); 
   }
 }
 
@@ -900,10 +980,15 @@ function viewCampaign(id) {
   document.getElementById('campaignStatus').value = c.status || 'draft';
   document.getElementById('campaignSchedule').value = c.schedule || '';
 
+  document.getElementById('campaignSentCount').value = c.sent_count || 0;
+  document.getElementById('campaignOpenRate').value = c.open_rate || 0;
+  document.getElementById('campaignClickRate').value = c.click_rate || 0;
+
   document.getElementById('createCampaignTitle').textContent = "View Campaign";
   document.getElementById('campaignSaveBtn').style.display = "none";
   document.getElementById('campaignCancelBtn').textContent = "Close";
   document.getElementById('campaignExtraStats').style.display = "block";
+  document.getElementById('campaignAdminFields').style.display = "block";
 
   toggleCampaignFields(false);
   document.getElementById('createCampaignModal')?.classList.add('active');
@@ -917,7 +1002,10 @@ function toggleCampaignFields(enable) {
     'campaignAudience',
     'campaignMessage',
     'campaignStatus',
-    'campaignSchedule'
+    'campaignSchedule',
+    'campaignSentCount',
+    'campaignOpenRate',
+    'campaignClickRate'
   ];
 
   fields.forEach(id => {
@@ -965,13 +1053,20 @@ function renderFeedback() {
       .join('')
       .toUpperCase() || 'G';
 
+    // Add guest profile link if available
+    let guestProfileHtml = '';
+    if (item.guest_profile_url && item.guest_id) {
+      // Instead of <a href=...>, use a button to open the modal
+      guestProfileHtml = `<button onclick="viewGuest(${item.guest_id})" style="color:#3b82f6;text-decoration:underline;font-size:13px;margin-left:8px;background:none;border:none;cursor:pointer;">View Profile</button>`;
+    }
+
     const card = document.createElement('div');
     card.className = 'feedback-card';
     card.innerHTML = `
       <div class="feedback-header">
         <div class="feedback-avatar">${avatar}</div>
         <div class="feedback-info">
-          <h3>${escapeHtml(item.guest_name || '—')}</h3>
+          <h3>${escapeHtml(item.guest_name || '—')}${guestProfileHtml}</h3>
           <div class="feedback-meta">
             <span class="feedback-type ${item.type || ''}">${(item.type || '').toUpperCase()}</span>
             <span>${item.created_at ? new Date(item.created_at).toLocaleDateString() : ''}</span>
@@ -979,10 +1074,10 @@ function renderFeedback() {
         </div>
       </div>
       <div class="stars">${generateStars(item.rating || 0)}</div>
-      <div class="feedback-message">${escapeHtml(item.comment || item.message || '')}</div>
+      <div class="feedback-message">${escapeHtml(item.comment || '')}</div>
       ${
         item.reply
-          ? `<div class="feedback-reply" style="background:#f0f9ff;padding:12px;border-radius:8px;margin-top:12px;border-left:4px solid #3b82f6;"><strong>Reply:</strong> ${escapeHtml(item.reply)}</div>`
+          ? `<div class="feedback-reply" style="background:gray;padding:12px;border-radius:8px;margin-top:12px;border-left:4px solid #3b82f6;"><strong>Reply:</strong> ${escapeHtml(item.reply)}</div>`
           : ''
       }
       <div class="feedback-actions">
@@ -997,8 +1092,8 @@ function renderFeedback() {
 }
 
 function updateFeedbackStats() {
+  // Only count reviews, remove service_feedback
   const totalReviews = feedback.filter(f => f.type === 'review').length;
-  const totalServiceFeedback = feedback.filter(f => f.type === 'service_feedback').length;
 
   const rated = feedback.filter(f => f.rating && !isNaN(f.rating));
   const avgRating = rated.length
@@ -1011,26 +1106,19 @@ function updateFeedbackStats() {
 
   // Growth rates (dummy, you should replace with real previous values if available)
   const prevTotalReviews = window.prevTotalReviews ?? totalReviews;
-  const prevTotalServiceFeedback = window.prevTotalServiceFeedback ?? totalServiceFeedback;
   const prevAvgRating = window.prevAvgRating ?? avgRating;
 
   if (document.getElementById('averageRating')) document.getElementById('averageRating').textContent = avgRating;
   if (document.getElementById('totalReviews')) document.getElementById('totalReviews').textContent = totalReviews;
-  if (document.getElementById('totalServiceFeedback')) document.getElementById('totalServiceFeedback').textContent = totalServiceFeedback;
 
   if (document.getElementById('statAverageRating')) document.getElementById('statAverageRating').textContent = avgRating;
   if (document.getElementById('statTotalReviews')) {
     document.getElementById('statTotalReviews').textContent = totalReviews;
     setGrowthRateById('growthTotalReviews', calcGrowthRate(totalReviews, prevTotalReviews));
   }
-  if (document.getElementById('statServiceFeedback')) {
-    document.getElementById('statServiceFeedback').textContent = totalServiceFeedback;
-    setGrowthRateById('growthServiceFeedback', calcGrowthRate(totalServiceFeedback, prevTotalServiceFeedback));
-  }
   if (document.getElementById('statResolutionRate')) document.getElementById('statResolutionRate').textContent = resolutionRate + '%';
   // Save current as previous for next call
   window.prevTotalReviews = totalReviews;
-  window.prevTotalServiceFeedback = totalServiceFeedback;
   window.prevAvgRating = avgRating;
 }
 
@@ -1050,9 +1138,71 @@ function showFeedbackType(type) {
   });
   renderFeedback();
 }
+function replyToFeedback(id) {
+  // Find feedback item
+  const item = feedback.find(f => Number(f.id) === Number(id));
+  if (!item) return showNotification('Feedback not found', 'error');
 
+  // Show reply modal and set up form
+  const modal = document.getElementById('replyModal');
+  if (!modal) return;
+
+  document.getElementById('replyFeedbackId').value = item.id;
+  document.getElementById('replyMessage').value = item.reply || '';
+
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
+
+  // Attach submit handler (detach first to avoid duplicates)
+  const form = document.getElementById('replyForm');
+  if (form) {
+    form.onsubmit = async function(e) {
+      e.preventDefault();
+      await sendFeedbackReply();
+    };
+  }
+}
+
+async function sendFeedbackReply() {
+  const id = document.getElementById('replyFeedbackId').value;
+  const reply = document.getElementById('replyMessage').value.trim();
+  if (!id || !reply) {
+    showNotification('Reply cannot be empty', 'error');
+    return;
+  }
+  try {
+    await apiRequest('feedback.php', 'PUT', { id, reply });
+    await loadFeedback();
+    closeModal('replyModal');
+    showNotification('Reply sent successfully!');
+  } catch (e) {
+    showNotification('Failed to send reply', 'error');
+  }
+}
+
+async function updateFeedbackStatus(id, status = 'approved') {
+  try {
+    await apiRequest('feedback.php', 'PUT', { id, status });
+    await loadFeedback();
+    showNotification('Feedback approved!');
+  } catch (e) {
+    showNotification('Failed to approve feedback', 'error');
+  }
+}
+
+async function deleteFeedback(id) {
+  if (!confirm('Are you sure you want to delete this feedback?')) return;
+  try {
+    await apiRequest('feedback.php', 'DELETE', { id });
+    await loadFeedback();
+    showNotification('Feedback deleted successfully!');
+  } catch (e) {
+    showNotification('Failed to delete feedback', 'error');
+  }
+}
 function showComplaintType(type) {
-  currentComplaintType = type;
+  // Only allow 'all' and 'complaint'
+  currentComplaintType = type === 'complaint' ? 'complaint' : 'all';
   document.querySelectorAll('#complaints .tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('#complaints .tab-btn').forEach(b => {
     const on = b.getAttribute('onclick') || '';
@@ -1177,9 +1327,28 @@ async function loadGuestOptions() {
     guests.forEach(g => {
       const opt = document.createElement('option');
       opt.value = g.guest_id || g.id;
-      opt.textContent = `${g.name} (${g.email || 'no email'})`;
+      // Add guest profile info as data attributes
+      opt.textContent = `${g.first_name || ''} ${g.last_name || ''} (${g.email || 'no email'})`;
+      opt.setAttribute('data-profile', JSON.stringify({
+        guest_id: g.guest_id || g.id,
+        first_name: g.first_name || '',
+        last_name: g.last_name || '',
+        email: g.email || '',
+        status: g.status || '',
+        loyalty_tier: g.loyalty_tier || ''
+      }));
       select.appendChild(opt);
     });
+
+    // Optional: On change, show guest profile info somewhere in the form
+    select.onchange = function() {
+      const selected = select.options[select.selectedIndex];
+      const profile = selected.getAttribute('data-profile');
+      if (profile) {
+        // You can parse and display this profile info in your complaint modal as needed
+        // Example: console.log(JSON.parse(profile));
+      }
+    };
   } catch (err) {
     console.error('Failed to load guests for complaint select', err);
   }
@@ -1429,7 +1598,8 @@ function renderPrograms(stats = {}) {
       </div>
       <div class="program-details">
         <div class="points-info" style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-          <span style="font-size: 16px;">Points per $1: <strong style="color: #fbbf24;">${p.points_rate || 0}x</strong></span>
+          <span style="font-size: 16px;">Points per ₱1 Spent: <strong style="color: #fbbf24;">${p.points_rate || 0}x</strong></span>
+          <span style="font-size: 16px; margin-left: 16px;">Discount Rate: <strong style="color: #10b981;">${p.discount_rate ? (p.discount_rate + '%') : '0%'}</strong></span>
         </div>
         ${benefits.length > 0 ? `
           <div class="benefits-section">
@@ -1500,6 +1670,7 @@ async function createProgram(e) {
   const pointsRate = document.getElementById('programPointsRate')?.value.trim();
   const benefits = document.getElementById('programBenefits')?.value.trim();
   const membersCount = document.getElementById('programMembersCount')?.value.trim();
+  const discountRate = document.getElementById('programDiscountRate')?.value.trim(); // <-- ADD THIS LINE
 
   if (!name || !tier || !pointsRate) {
     return showNotification('Please fill in all required fields', 'error');
@@ -1511,6 +1682,7 @@ async function createProgram(e) {
     points_rate: parseFloat(pointsRate),
     benefits,
     members_count: membersCount ? parseInt(membersCount, 10) : 0,
+    discount_rate: discountRate ? parseFloat(discountRate) : 0.0 // <-- ADD THIS LINE
   };
 
   try {
@@ -1542,16 +1714,17 @@ function closeModal(id) {
     const title = m.querySelector('h3');
     if (title) title.textContent = 'Create New Campaign';
     document.getElementById('createCampaignForm')?.reset();
-  } else if (id === 'editGuestModal') {
-    editingGuestId = null;
-    document.getElementById('editGuestForm')?.reset();
+  } else if (id === 'viewGuestModal') {
+    const form = document.getElementById('viewGuestForm');
+    if (form) form.reset();
   } else if (id === 'addGuestModal') {
     document.getElementById('addGuestForm')?.reset();
   } else if (id === 'editComplaintModal') {
     editingComplaintId = null;
     document.getElementById('editComplaintForm')?.reset();
   } else if (id === 'createComplaintModal') {
-    document.getElementById('createComplaintForm')?.reset();
+     
+      document.getElementById('createComplaintForm')?.reset();
   } else if (id === 'createProgramModal') {
     document.getElementById('createProgramForm')?.reset();
   }
@@ -1564,14 +1737,12 @@ function closeAllModals() {
 
 function attachStaticListeners() {
   detachListener('#addGuestForm', 'submit', addGuest);
-  detachListener('#editGuestForm', 'submit', updateGuest);
   detachListener('#createCampaignForm', 'submit', createCampaign);
   detachListener('#createProgramForm', 'submit', createProgram);
   detachListener('#createComplaintForm', 'submit', createComplaint);
   detachListener('#editComplaintForm', 'submit', updateComplaint);
 
   document.querySelector('#addGuestForm')?.addEventListener('submit', addGuest);
-  document.querySelector('#editGuestForm')?.addEventListener('submit', updateGuest);
   document.querySelector('#createCampaignForm')?.addEventListener('submit', createCampaign);
   document.querySelector('#createProgramForm')?.addEventListener('submit', createProgram);
   document.querySelector('#createComplaintForm')?.addEventListener('submit', createComplaint);
@@ -1611,8 +1782,7 @@ window.loadAll = loadAll;
 
 window.showAddGuestModal = showAddGuestModal;
 window.addGuest = addGuest;
-window.editGuest = editGuest;
-window.updateGuest = updateGuest;
+window.viewGuest = viewGuest;
 window.deleteGuest = deleteGuest;
 window.filterGuests = filterGuests;
 
@@ -1621,6 +1791,7 @@ window.createCampaign = createCampaign;
 window.editCampaign = editCampaign;
 window.deleteCampaign = deleteCampaign;
 window.viewCampaign = viewCampaign;
+
 
 window.showFeedbackType = showFeedbackType;
 window.replyToFeedback = replyToFeedback;
@@ -1641,3 +1812,4 @@ window.replyToComplaint = replyToComplaint;
 window.deleteComplaint = deleteComplaint;
 
 window.loadGuestOptions = loadGuestOptions;
+window.showPurchaseHistory = showPurchaseHistory;

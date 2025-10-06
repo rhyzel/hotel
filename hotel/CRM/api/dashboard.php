@@ -57,12 +57,7 @@ try {
         'loyalty_members' => 0,
         'active_campaigns' => 0,
         'avg_rating' => 0.0,
-        'total_complaints' => 0,
         'resolved_complaints' => 0,
-        'resolution_rate' => 0,
-        'active_complaints' => 0,
-        'suggestions' => 0,
-        'compliments' => 0,
         'guest_trends' => [],
         'loyalty_distribution' => [],
         'complaint_trends' => []
@@ -109,14 +104,12 @@ try {
     // Enhanced Complaint Statistics
     if ($hasComplaints) {
         try {
-            // Main complaint stats query
+            // Main complaint stats query (only complaints)
             $stmt = $conn->query("
                 SELECT 
                     COUNT(*) as total_complaints,
                     SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved,
                     SUM(CASE WHEN status NOT IN ('resolved', 'dismissed') THEN 1 ELSE 0 END) as active,
-                    SUM(CASE WHEN type = 'suggestion' THEN 1 ELSE 0 END) as suggestions,
-                    SUM(CASE WHEN type = 'compliment' THEN 1 ELSE 0 END) as compliments,
                     ROUND(
                         CASE 
                             WHEN COUNT(*) > 0 THEN (SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) / COUNT(*)) * 100
@@ -125,6 +118,7 @@ try {
                         1
                     ) as resolution_rate
                 FROM complaints
+                WHERE type = 'complaint'
             ");
             
             $complaintStats = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -133,12 +127,10 @@ try {
                 $dashboardData['total_complaints'] = intval($complaintStats['total_complaints']);
                 $dashboardData['resolved_complaints'] = intval($complaintStats['resolved']);
                 $dashboardData['active_complaints'] = intval($complaintStats['active']);
-                $dashboardData['suggestions'] = intval($complaintStats['suggestions']);
-                $dashboardData['compliments'] = intval($complaintStats['compliments']);
                 $dashboardData['resolution_rate'] = floatval($complaintStats['resolution_rate']);
             }
 
-            // Complaint trends (last 6 months)
+            // Complaint trends (last 6 months, only complaints)
             try {
                 $complaintsQuery = "
                     SELECT 
@@ -147,6 +139,7 @@ try {
                         SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved_count
                     FROM complaints
                     WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+                      AND type = 'complaint'
                     GROUP BY DATE_FORMAT(created_at, '%Y-%m'), DATE_FORMAT(created_at, '%b')
                     ORDER BY MIN(created_at)
                 ";
@@ -169,8 +162,6 @@ try {
             $dashboardData['total_complaints'] = 0;
             $dashboardData['resolved_complaints'] = 0;
             $dashboardData['active_complaints'] = 0;
-            $dashboardData['suggestions'] = 0;
-            $dashboardData['compliments'] = 0;
             $dashboardData['resolution_rate'] = 0;
         }
     }
@@ -284,6 +275,10 @@ try {
     if (!empty($additionalStats)) {
         $dashboardData['additional_stats'] = $additionalStats;
     }
+
+    // Remove suggestions and compliments from dashboardData
+    unset($dashboardData['suggestions']);
+    unset($dashboardData['compliments']);
 
     echo json_encode([
         'success' => true,

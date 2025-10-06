@@ -12,9 +12,16 @@ if ($method === 'OPTIONS') {
     exit(); 
 }
 
+require_once __DIR__ . '/../bootstrap.php';
 require_once __DIR__ . '/database.php';
 $db = new Database();
 $conn = $db->getConnection();
+use CRM\Lib\ApiDatabase as CRMDatabase;
+use CRM\Lib\ComplaintController;
+use CRM\Lib\GuestRepository;
+use CRM\Lib\GuestService;
+
+$controller = new ComplaintController($conn);
 
 function respond($data, $code = 200) { 
     http_response_code($code); 
@@ -52,17 +59,35 @@ try {
         respond(['success' => false, 'error' => 'Invalid execution context. Must be run via HTTP request.'], 400);
     }
 
+    // --- ADD THIS BLOCK: provide guest options for complaints ---
+    if ($method === 'GET' && isset($_GET['guests']) && $_GET['guests'] == '1') {
+        // Fetch all guests for dropdown
+        $guestRepo = new GuestRepository($conn);
+        $guestService = new GuestService($guestRepo);
+        $guests = $guestService->listGuests('');
+        // Return only id, name, email for dropdown
+        $guestOptions = array_map(function($g) {
+            $id = $g['guest_id'] ?? $g['id'] ?? null;
+            $name = trim(($g['first_name'] ?? '') . ' ' . ($g['last_name'] ?? ''));
+            if (!$name && isset($g['name'])) $name = $g['name'];
+            return [
+                'id' => $id,
+                'name' => $name,
+                'email' => $g['email'] ?? ''
+            ];
+        }, $guests);
+        respond(['success' => true, 'data' => $guestOptions]);
+    }
+
     switch ($method) {
         case 'GET':
             // Stats mode
             if (isset($_GET['stats']) && $_GET['stats'] == '1') {
-                $stmt = $conn->prepare("
-                    SELECT 
+                // Only count complaints, remove suggestions/compliments
+                $stmt = $conn->prepare("SELECT 
                       COUNT(*) AS total_complaints,
                       SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) AS resolved_complaints,
                       SUM(CASE WHEN status IN ('pending','in-progress') THEN 1 ELSE 0 END) AS active_complaints,
-                      SUM(CASE WHEN type = 'suggestion' THEN 1 ELSE 0 END) AS total_suggestions,
-                      SUM(CASE WHEN type = 'compliment' THEN 1 ELSE 0 END) AS total_compliments,
                       ROUND(
                         CASE 
                           WHEN COUNT(*) > 0 THEN (SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) / COUNT(*)) * 100
@@ -70,26 +95,19 @@ try {
                         END,
                         1
                       ) AS resolution_rate
-                    FROM complaints
-                ");
+                    FROM complaints WHERE type = 'complaint'");
                 $stmt->execute();
                 $summary = $stmt->fetch(PDO::FETCH_ASSOC);
-
                 respond(['success' => true, 'data' => $summary]);
             }
 
             // Normal listing
-            $query = "SELECT * FROM complaints WHERE 1=1";
+            $query = "SELECT * FROM complaints WHERE type = 'complaint'";
             $params = [];
 
             if (isset($_GET['status']) && $_GET['status'] !== 'all') {
                 $query .= " AND status = :status";
                 $params[':status'] = $_GET['status'];
-            }
-
-            if (isset($_GET['type']) && $_GET['type'] !== 'all') {
-                $query .= " AND type = :type";
-                $params[':type'] = $_GET['type'];
             }
 
             if (isset($_GET['search'])) {
@@ -101,21 +119,6 @@ try {
             $stmt = $conn->prepare($query);
             $stmt->execute($params);
             $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Normalize data for frontend compatibility
-            foreach ($items as &$item) {
-                // Handle message/comment field mapping
-                if (in_array('comment', $complaintsColumns) && !isset($item['message'])) {
-                    $item['message'] = $item['comment'];
-                } elseif (in_array('message', $complaintsColumns) && !isset($item['comment'])) {
-                    $item['comment'] = $item['message'];
-                }
-
-                // Set defaults
-                $item['type'] = $item['type'] ?? 'complaint';
-                $item['status'] = $item['status'] ?? 'pending';
-            }
-
             respond(['success' => true, 'data' => $items]);
             break;
 
@@ -126,23 +129,8 @@ try {
                 respond(['success' => false, 'error' => 'Missing required fields: guest_id/guest_name and comment'], 400);
             }
 
-            // Resolve guest_name if guest_id is provided
-            $guestName = $input['guest_name'] ?? '';
-            $guest_id = null;
-
-            if (!empty($input['guest_id'])) {
-                $stmt = $conn->prepare("SELECT $guestNameQuery as name FROM guests WHERE $guestPrimaryKey = :guest_id");
-                $stmt->execute([':guest_id' => $input['guest_id']]);
-                $guest = $stmt->fetch(PDO::FETCH_ASSOC);
-                if ($guest) {
-                    $guestName = $guest['name'];
-                    $guest_id = $input['guest_id'];
-                }
-            }
-
-            $type = $input['type'] ?? 'complaint';
-            $validTypes = ['complaint', 'suggestion', 'compliment'];
-            if (!in_array($type, $validTypes)) $type = 'complaint';
+            // Only allow complaint type
+            $type = 'complaint';
 
             $rating = isset($input['rating']) ? intval($input['rating']) : null;
             if ($rating !== null && ($rating < 1 || $rating > 5)) $rating = null;
@@ -151,16 +139,16 @@ try {
             $fields = ['guest_name', 'status', 'type', 'created_at'];
             $values = [':guest_name', ':status', ':type', 'NOW()'];
             $params = [
-                ':guest_name' => $guestName,
+                ':guest_name' => $input['guest_name'] ?? '',
                 ':status' => $input['status'] ?? 'pending',
                 ':type' => $type
             ];
 
             // Add guest_id if column exists and value provided
-            if (in_array('guest_id', $complaintsColumns) && $guest_id) {
+            if (in_array('guest_id', $complaintsColumns) && !empty($input['guest_id'])) {
                 $fields[] = 'guest_id';
                 $values[] = ':guest_id';
-                $params[':guest_id'] = $guest_id;
+                $params[':guest_id'] = $input['guest_id'];
             }
 
             // Add comment/message field
@@ -190,12 +178,6 @@ try {
             $stmt = $conn->prepare("SELECT * FROM complaints WHERE id = :id");
             $stmt->execute([':id' => $id]);
             $new = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            // Normalize for frontend
-            if (in_array('comment', $complaintsColumns) && !isset($new['message'])) {
-                $new['message'] = $new['comment'];
-            }
-
             respond(['success' => true, 'data' => $new], 201);
             break;
 
@@ -226,10 +208,8 @@ try {
                 $params[':reply'] = trim($input['reply']);
             }
 
-            if (isset($input['type'])) {
-                $updateFields[] = "type = :type";
-                $params[':type'] = $input['type'];
-            }
+            // Only allow complaint type
+            $updateFields[] = "type = 'complaint'";
 
             if (isset($input['rating']) && in_array('rating', $complaintsColumns)) {
                 $updateFields[] = "rating = :rating";
