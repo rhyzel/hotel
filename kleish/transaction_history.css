@@ -1,0 +1,118 @@
+
+body {
+  margin: 0;
+  font-family: 'Quicksand', sans-serif;
+  background-color: #f5f0e1; 
+  color: #3e2c1c; 
+}
+
+h1 {
+  margin-right: 100px;
+  color: #3e2c1c;
+  margin-top: 0px;
+}
+
+a {
+  color: #5c3d2e;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+a:hover {
+  color: #a67b5b;
+}
+
+.back-btn {
+  display: inline-block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #5c3d2e;
+  color: white;
+  border-radius: 6px;
+  text-align: center;
+}
+
+
+.main-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+
+.dashboard .card {
+  background-color: #fff8f0;
+  border: 1px solid #e0d7c2;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(100, 75, 50, 0.1);
+}
+
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd0b4;
+}
+
+th {
+  background-color: #d8c3a5;
+  color: #3e2c1c;
+}
+
+tr:nth-child(even) {
+  background-color: #fdfaf6;
+}
+
+tr:hover {
+  background-color: #f0e6d2;
+}
+
+form input[type="text"],
+form input[type="date"] {
+  padding: 8px;
+  border: 1px solid #b5a189;
+  border-radius: 4px;
+  background-color: #fffaf4;
+  color: #3e2c1c;
+}
+
+form button {
+  padding: 8px 14px;
+  background-color: #5c3d2e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+form button:hover {
+  background-color: #8b5e3c;
+}
+
+form a {
+  background-color: #3d6c3d;
+  color: white;
+  border-radius: 4px;
+  padding: 8px 14px;
+}
+
+form a:hover {
+  background-color: #2f5c2f;
+}
+
+
+footer {
+  text-align: center;
+  margin-top: 40px;
+  padding: 15px;
+  font-size: 14px;
+  background-color: #3e2c1c;
+  color: white;
+  border-top: 2px solid #a18874;
+}

@@ -1,6 +1,8 @@
 <?php
-// room_status.php
-include '../../db_connect.php'; // adjust path if needed
+
+include __DIR__ . '/../db.php';
+
+
 
 // Fetch all rooms with Dirty, Cleaning, and Under Maintenance statuses
 $sql = "SELECT room_id, room_number, room_type, max_occupancy, price_rate, status

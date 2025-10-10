@@ -17,7 +17,7 @@ $orders = [];
 foreach($ordersRaw as $o){
     $stmtCheck = $pdo->prepare("
         SELECT gb.* FROM guest_billing gb
-        LEFT JOIN reported_order ro ON gb.order_id = ro.order_id AND gb.item = ro.reported_item
+        LEFT JOIN reported_order ro ON gb.order_id = ro.order_id AND gb.item = ro.item
         WHERE gb.order_id = ? AND gb.amount > gb.partial_payment AND ro.id IS NULL
     ");
     $stmtCheck->execute([$o['order_id']]);
@@ -41,12 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $final_note = $complain_reason === 'Other' ? $other_note : '';
 
         foreach($items as $item){
-            $stmtCheck = $pdo->prepare("SELECT id FROM reported_order WHERE order_id=? AND reported_item=?");
+            $stmtCheck = $pdo->prepare("SELECT id FROM reported_order WHERE order_id=? AND item=?");
             $stmtCheck->execute([$order_id, $item]);
             if(!$stmtCheck->fetch()){
                 $stmt = $pdo->prepare("
                     INSERT INTO reported_order 
-                    (order_id, guest_id, guest_name, reported_item, complain_reason, resolution, assigned_chef, status, reported_at, order_type, table_number, room_number) 
+                    (order_id, guest_id, guest_name, item, complain_reason, resolution, assigned_chef, status, reported_at, order_type, table_number, room_number) 
                     VALUES (?,?,?,?,?,?,?,?,NOW(),?,?,?)
                 ");
                 $stmt->execute([
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $totalRemaining += ($i['amount'] - $i['partial_payment']);
                     }
                     foreach($allItems as $itemData){
-                        if($itemData['item'] === $item){
+                        if(isset($itemData['item']) && $itemData['item'] === $item){
                             $refundAmount = $itemData['amount'] - $itemData['partial_payment'];
                             $newRemaining = max(0, $totalRemaining - $refundAmount);
                             $stmtUpdateOriginal = $pdo->prepare("
@@ -128,7 +128,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
+
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -258,7 +260,7 @@ document.getElementById('items').dispatchEvent(new Event('change'));
 
 document.getElementById('complain_reason').addEventListener('change', function(){
 document.getElementById('other_note').style.display = this.value === 'Other' ? 'block' : 'none';
-});
-</script>
+}); </script>
+
 </body>
 </html>

@@ -1,0 +1,240 @@
+:root {
+    --primary-brown-light: #d2b48c; 
+    --primary-brown-dark: #5c4033; 
+    --text-light: #ffffff;
+    --text-dark: #2c2c2c;
+    --accent-gold: #bfa76f;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Quicksand', sans-serif;
+}
+
+
+body {
+    background: var(--primary-brown-light);
+    color: var(--text-dark);
+    display: flex;
+    justify-content: center; 
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.main-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px;
+}
+
+
+header {
+    background: var(--primary-brown-dark);
+    color: var(--text-light);
+    padding: 1rem 2rem;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.5rem;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 3rem;
+   margin-left: -20px; 
+}
+
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr; 
+    gap: 1.5rem;
+    justify-items: center; 
+}
+
+.card {
+    background: var(--primary-brown-light);
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 100%; 
+}
+
+.card h3 {
+    font-size: 1.75rem;
+    color: #000000;
+    margin-bottom: 1.5rem;
+}
+
+.card table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.card table th,
+.card table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.card table th {
+    background-color: var(--accent-gold);
+    color: white;
+}
+
+.card table td {
+    background-color: #f9f9f9;
+}
+
+.card table td a {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.card table td a:hover {
+    background-color: #0056b3;
+}
+
+
+.btn {
+    padding: 8px 16px;
+    background-color: var(--accent-gold);
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s ease;
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+.btn:hover {
+    background-color: #bfa76f;
+}
+
+
+footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+
+@media (max-width: 768px) {
+    .main-content {
+        width: 90%; 
+        padding: 1rem;
+    }
+
+    header h1 {
+        font-size: 2rem; 
+    }
+
+    .dashboard {
+        grid-template-columns: 1fr; 
+    }
+
+    .card {
+        width: 100%; 
+    }
+
+    .card table {
+        font-size: 0.875rem; 
+    }
+
+
+.btn {
+    background-color: #3d2b1f; /* Dark brown */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #5a3e29; /* Lighter brown */
+}
+
+/* Add product button */
+#add-product-btn {
+    margin-top: 20px;
+    display: inline-block;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Form styles */
+#add-product-form {
+    display: none;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+#add-product-form form {
+    display: flex;
+    flex-direction: column;
+}
+
+#add-product-form label {
+    font-weight: 600;
+    color: #3d2b1f; /* Dark brown */
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+#add-product-form input,
+#add-product-form select {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#add-product-form input:focus,
+#add-product-form select:focus {
+    border-color: #5a3e29; 
+    outline: none;
+}
+
+#close-form-btn {
+    background-color: #523809;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+#close-form-btn:hover {
+    background-color: #523809; /* Darker red */
+}
+
+}

@@ -10,7 +10,7 @@ if ($order_id > 0) {
         FROM guest_billing gb
         LEFT JOIN reported_order ro 
             ON gb.order_id = ro.order_id 
-            AND gb.item = ro.reported_item
+            AND gb.item = ro.item
         WHERE gb.order_id = ? 
           AND gb.amount > gb.partial_payment 
           AND ro.id IS NULL

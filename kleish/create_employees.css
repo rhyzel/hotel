@@ -1,0 +1,111 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4e1d2;
+    color: #3d2a1f;
+    padding: 20px;
+}
+
+h2 {
+    text-align: center;
+    color: #3d2a1f;
+    font-size: 1.85rem;
+    margin: 0 auto 20px;
+    display: block;
+    width: 100%;
+    max-width: 700px;
+    font-family: Quicksand, sans-serif;
+}
+
+.back-btn {
+    text-decoration: none;
+    background-color: #6f4f28;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    display: inline-block;
+    margin: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+    background-color: #4e3629;
+}
+
+form {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #d8b89e;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+form input {
+    width: 100%;
+    padding: 5px;
+    margin: 5px 0;
+    font-size: 16px;
+    border: 1px solid #b98f6b;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+form input:focus {
+    border-color: #6f4f28;
+    outline: none;
+}
+
+form button {
+    background-color: #6f4f28;
+    color: white;
+    padding: 5px;
+    font-size: 18px;
+    border-radius: 5px;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border: none;
+}
+
+form button:hover {
+    background-color: #4e3629;
+}
+
+.input-container {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+input[type="text"], input[type="email"], input[type="date"], input[type="number"] {
+    width: 98%;
+    padding: 10px;
+    font-size: 10px;
+    border: 1px solid #b98f6b;
+    border-radius: 5px;
+    background-color: #fff;
+    transition: 0.3s ease;
+}
+
+input[type="text"]:focus + label, input[type="email"]:focus + label, input[type="date"]:focus + label, input[type="number"]:focus + label,
+input[type="text"]:not(:placeholder-shown) + label, input[type="email"]:not(:placeholder-shown) + label, input[type="date"]:not(:placeholder-shown) + label, input[type="number"]:not(:placeholder-shown) + label {
+    top: -10px;
+    font-size: 15px;
+    color: #6f4f28;
+}
+
+label {
+    position: absolute;
+    top: 14px;
+    left: 12px;
+    font-size: 16px;
+    color: #6f4f28;
+    transition: 0.3s ease;
+    pointer-events: none;
+}

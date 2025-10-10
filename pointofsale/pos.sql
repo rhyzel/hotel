@@ -392,7 +392,7 @@ CREATE TABLE `refunds` (
   `guest_id` int(11) NOT NULL,
   `guest_name` varchar(255) NOT NULL,
   `order_id` int(11) NOT NULL,
-  `item_name` varchar(255) NOT NULL,
+  `item` varchar(255) NOT NULL,
   `refund_amount` decimal(10,2) NOT NULL,
   `payment_method` varchar(50) DEFAULT 'Cash',
   `status` enum('Pending','Completed') DEFAULT 'Completed',
@@ -444,7 +444,7 @@ CREATE TABLE `reported_items` (
   `order_id` varchar(50) NOT NULL,
   `guest_id` int(11) DEFAULT NULL,
   `guest_name` varchar(255) DEFAULT NULL,
-  `reported_item` varchar(255) NOT NULL,
+  `item` varchar(255) NOT NULL,
   `complain_reason` text DEFAULT NULL,
   `resolution` varchar(100) DEFAULT NULL,
   `status` varchar(50) DEFAULT 'pending',
@@ -457,7 +457,7 @@ CREATE TABLE `reported_items` (
 -- Dumping data for table `reported_items`
 --
 
-INSERT INTO `reported_items` (`id`, `order_id`, `guest_id`, `guest_name`, `reported_item`, `complain_reason`, `resolution`, `status`, `reported_at`, `order_type`, `assigned_cashier`) VALUES
+INSERT INTO `reported_items` (`id`, `order_id`, `guest_id`, `guest_name`, `item`, `complain_reason`, `resolution`, `status`, `reported_at`, `order_type`, `assigned_cashier`) VALUES
 (10, '2387', 4, 'Emily Brown', 'Fragrant Candle', 'Damaged Product', 'Replacement', 'Replaced', '2025-10-09 00:17:20', 'Gift Store', 'EMP180969'),
 (11, '8894', 2, 'Jane Smith', 'Fridge Magnet Set', 'Wrong Item', 'Replacement', 'Replaced', '2025-10-10 19:59:35', 'Gift Store', 'EMP862997'),
 (12, '3489', 1, 'John Doe', 'Lemonade Bottle', 'Expired Item', 'Replacement', 'Replaced', '2025-10-10 20:05:32', 'Mini Bar', 'EMP862997');
@@ -900,7 +900,7 @@ ALTER TABLE `recipes`
 --
 ALTER TABLE `refunds`
   ADD PRIMARY KEY (`refund_id`),
-  ADD KEY `idx_order_item` (`order_id`,`item_name`);
+  ADD KEY `idx_order_item` (`order_id`,`item`);
 
 --
 -- Indexes for table `replacement_orders`
