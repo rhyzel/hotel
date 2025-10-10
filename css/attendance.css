@@ -1,0 +1,201 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: beige;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff8f0;
+    border: 2px solid #800000;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.back-button {
+    display: inline-block;
+    text-decoration: none;
+    color: #fff;
+    background-color: #800000;
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #a00000;
+}
+
+h1 {
+    color: #800000;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #800000;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+.current-time {
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #800000;
+}
+
+.holiday-info {
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #fff0e0;
+    border-left: 6px solid #800000;
+    border-radius: 6px;
+}
+
+.date-selector {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.date-selector label {
+    font-weight: bold;
+    color: #800000;
+}
+
+.date-selector input[type="date"],
+.date-selector input[type="text"] {
+    padding: 6px 8px;
+    border: 1px solid #800000;
+    border-radius: 6px;
+}
+
+.date-selector button {
+    padding: 6px 16px;
+    background-color: #800000;
+    color: beige;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.date-selector button:hover {
+    background-color: #a00000;
+}
+
+form[action="schedule.php"] button {
+    padding: 8px 16px;
+    background-color: #800000;
+    color: beige;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+form[action="schedule.php"] button:hover {
+    background-color: #a00000;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+table thead {
+    background-color: #800000;
+    color: beige;
+}
+
+table thead th {
+    padding: 12px;
+    text-align: left;
+}
+
+table tbody td {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #fff4f0;
+}
+
+table tbody tr:hover {
+    background-color: #ffe6d9;
+}
+
+table button {
+    padding: 6px 12px;
+    background-color: #800000;
+    color: beige;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+table button:hover {
+    background-color: #a00000;
+}
+
+table input[type="number"] {
+    padding: 4px 6px;
+    border: 1px solid #800000;
+    border-radius: 6px;
+    width: 60px;
+}
+
+@media (max-width: 768px) {
+    .date-selector {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    table thead, table tbody, table tr, table td, table th {
+        display: block;
+        width: 100%;
+    }
+
+    table thead {
+        display: none;
+    }
+
+    table tbody tr {
+        margin-bottom: 15px;
+        border: 2px solid #800000;
+        border-radius: 12px;
+        padding: 10px;
+        background-color: #fff4f0;
+    }
+
+    table tbody td {
+        border: none;
+        padding: 8px 0;
+        text-align: left;
+        position: relative;
+    }
+
+    table tbody td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: inline-block;
+        width: 120px;
+        color: #800000;
+    }
+}

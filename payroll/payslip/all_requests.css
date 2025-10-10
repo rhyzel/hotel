@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+html, body {
+    height: 100%;
+    background: url('http://localhost/hotel/hr/payroll/hotel.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #4B5320;
+}
+
+.overlay {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 15px;
+    background: rgba(201, 214, 193, 0.25);
+}
+
+.container {
+    width: 100%;
+    max-width: 1300px;
+}
+
+.profile-header {
+    background: #C9D6C1;
+    padding: 20px;
+    border-radius: 12px;
+    border: 3px dotted #4B5320;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.profile-header h1 {
+    font-size: 2rem;
+    color: #4B5320;
+    margin-bottom: 20px;
+}
+
+.tools-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.nav-btn,
+.export-btn,
+.search-form button {
+    background-color: #FFFCE3;
+    color: #4B5320;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 2px solid #4B5320;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 42px;
+}
+
+.nav-btn:hover,
+.export-btn:hover,
+.search-form button:hover {
+    background-color: #7F946C;
+    color: #FFFCE3;
+}
+
+.search-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.search-form input {
+    padding: 0 12px;
+    border-radius: 6px;
+    border: 1px solid #9CAF88;
+    background: #FFFCE3;
+    color: #4B5320;
+    font-size: 1rem;
+    height: 42px;
+    flex: 1;
+}
+
+.section-card {
+    width: 100%;
+    margin-bottom: 30px;
+    border: 2px dotted #4B5320;
+    border-radius: 12px;
+    padding: 15px;
+    background-color: rgba(255, 252, 227, 0.85);
+}
+
+h2.section-title {
+    background-color: rgba(201, 214, 193, 0.7);
+    color: #4B5320;
+    text-align: center;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #FFFCE3;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(75, 83, 32, 0.1);
+}
+
+thead {
+    background: #F5F5DC;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px dotted #4B5320;
+}
+
+th {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+    background: rgba(156, 175, 136, 0.2);
+}
+
+tbody tr:nth-child(odd) {
+    background: rgba(245, 245, 220, 0.6);
+}
+
+tbody tr:hover {
+    background: rgba(75, 83, 32, 0.05);
+}
+
+a {
+    color: #4B5320;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #5A704F;
+}
+
+@media(max-width: 768px) {
+    .profile-header h1 { font-size: 1.6rem; }
+    .tools-row { flex-direction: column; gap: 10px; }
+    th, td { font-size: 0.9rem; }
+}
+
+@media(max-width: 480px) {
+    .search-form { flex-direction: column; gap: 5px; width: 100%; }
+    .search-form input { width: 100%; }
+}

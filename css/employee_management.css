@@ -1,0 +1,194 @@
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: #f5f0e6;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 25px 30px;
+  background-color: #fff4e6;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(128,0,0,0.1);
+}
+
+h1, h2 {
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: #800000;
+  text-align: center;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #800000;
+  padding: 6px 12px;
+  border: 1px solid #800000;
+  border-radius: 6px;
+  background: #fff4e6;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  background: #800000;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.search-form input, .search-form button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #800000;
+  font-size: 14px;
+  color: #800000;
+}
+
+.search-form button {
+  background-color: #800000;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.search-form button:hover {
+  background-color: #b30000;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+table th, table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  color: #800000;
+}
+
+table th {
+  background-color: #fff0e6;
+  font-weight: 600;
+}
+
+table tr:hover {
+  background-color: #fff2e6;
+}
+
+table a {
+  color: #800000;
+  text-decoration: none;
+}
+
+table a:hover {
+  text-decoration: underline;
+}
+
+input[type="number"], input[type="text"], input[type="email"], input[type="date"], select {
+  width: 200px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #800000;
+}
+
+button[name="update_employee"] {
+  padding: 10px 20px;
+  margin-top: 10px;
+  background-color: #800000;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button[name="update_employee"]:hover {
+  background-color: #b30000;
+}
+
+@media (max-width: 768px) {
+  .top-bar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .search-form {
+    justify-content: center;
+  }
+
+  input[type="number"], input[type="text"], input[type="email"], input[type="date"], select {
+    width: 100%;
+  }
+
+  button[name="update_employee"] {
+    width: 100%;
+  }
+}
+.edit-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 40px;
+  background-color: #fff0e6;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(128,0,0,0.1);
+}
+
+.edit-form input,
+.edit-form select,
+.edit-form button {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #800000;
+  font-size: 14px;
+}
+
+.edit-form input,
+.edit-form select {
+  width: 200px;
+}
+
+.edit-form button {
+  background-color: #800000;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.edit-form button:hover {
+  background-color: #b30000;
+}
+
+@media (max-width: 768px) {
+  .edit-form input,
+  .edit-form select,
+  .edit-form button {
+    width: 100%;
+  }
+}

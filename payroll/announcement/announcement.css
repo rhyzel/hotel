@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Delius&display=swap');
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('/fonts/roboto/Roboto-Regular.woff2') format('woff2'),
+         url('/fonts/roboto/Roboto-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('/fonts/roboto/Roboto-Bold.woff2') format('woff2'),
+         url('/fonts/roboto/Roboto-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Delius', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    scroll-behavior: smooth;
+}
+
+html, body {
+    height: 100%;
+    background: url('../hotel.jpg') no-repeat center center fixed;
+    background-size: cover;
+    background-attachment: fixed;
+    color: #4B5320;
+}
+
+.overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100%;
+    width: 100%;
+    background: rgba(201, 214, 193, 0.212);
+    padding: 30px 15px;
+}
+
+.container {
+    flex: 1;
+    max-width: 1200px;
+    display: flex;
+    gap: 30px;
+    border-radius: 12px;
+    border: 3px dotted #4B5320;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    padding: 20px;
+    background-color: rgba(156, 175, 136, 0.85);
+}
+
+
+ h1 {
+    width: 100%;
+    text-align: center;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #fffce3;
+    text-shadow: 1px 1px 0px #000000;
+}
+
+.announcement-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border: 2px dotted #4B5320;
+    border-radius: 12px;
+    padding: 15px;
+    background-color: #FFFCE3;
+}
+.announcement-form input,
+.announcement-form select,
+.announcement-form textarea {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #4b5320;
+    font-size: 14px;
+    color: #0c0c0c;
+    width: 100%;
+    background-color: #FFFCE3;
+}
+
+
+.announcement-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.nav-btn, #add-btn, #update-btn, #cancel-btn, .edit-btn, .delete-btn {
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px dotted #4B5320;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+    background-color: #9CAF88;
+    color: #000000;
+    text-decoration: none;
+}
+
+
+.nav-btn:hover,
+#add-btn:hover,
+#update-btn:hover,
+#cancel-btn:hover {
+    background-color: #9CAF88;
+    color: #FFFCE3;
+}
+.edit-btn {
+    background-color: #9CAF88;
+    color: #0c0c0c;
+}
+
+.edit-btn:hover {
+    background-color: #7F946C;
+    color: #FFFCE3;
+}
+
+.delete-btn {
+    background-color: #9CAF88;
+    color: #000000;
+}
+
+.delete-btn:hover {
+    background-color: #7F946C;
+    color: #FFFCE3;
+}
+
+.announcement-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+    max-height: 80vh;
+    border: 2px dotted #4B5320;
+    border-radius: 12px;
+    padding: 15px;
+    background-color: #FFFCE3;
+}
+
+.announcement-item {
+    padding: 15px;
+    border: 1px solid #9CAF88;
+    border-radius: 8px;
+    background-color: #FFFCE3;
+}
+
+.announcement-item h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #4B5320;
+}
+
+.announcement-item p em {
+    color: #4B5320;
+    font-style: normal;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+}
+.announcement-item p {
+    margin-bottom: 10px;
+    color: #000000;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 1024px) {
+    .container {
+        flex-direction: column;
+        max-width: 100%;
+    }
+    .announcement-list {
+        max-height: none;
+    }
+    .form-buttons {
+        flex-direction: column;
+    }
+    .nav-btn,
+    #add-btn,
+    #update-btn,
+    #cancel-btn,
+    .edit-btn,
+    .delete-btn {
+        width: 100%;
+    }
+}
