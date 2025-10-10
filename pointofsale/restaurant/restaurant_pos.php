@@ -11,30 +11,30 @@ if (isset($_POST['clear_cart'])) {
     $_SESSION['order_restaurant'] = $order;
 }
 
-if (!empty($_GET['guest'])) {
-    $val = $_GET['guest'];
-    if (is_numeric($val)) {
+$guest_input = $_GET['guest'] ?? $_POST['guest_id'] ?? null;
+if ($guest_input) {
+    if (is_numeric($guest_input)) {
         $stmt = $conn->prepare("
             SELECT g.guest_id, g.first_name, g.last_name, rm.room_number
             FROM guests g
-            LEFT JOIN reservations r ON g.guest_id = r.guest_id AND r.status='checked_in'
+            LEFT JOIN reservations r ON g.guest_id = r.guest_id
             LEFT JOIN rooms rm ON r.room_id = rm.room_id
             WHERE g.guest_id = ?
-            ORDER BY r.check_in DESC
+            ORDER BY r.status='checked_in' DESC, r.check_in DESC
             LIMIT 1
         ");
-        $stmt->execute([$val]);
+        $stmt->execute([$guest_input]);
     } else {
         $stmt = $conn->prepare("
             SELECT g.guest_id, g.first_name, g.last_name, rm.room_number
             FROM guests g
-            LEFT JOIN reservations r ON g.guest_id = r.guest_id AND r.status='checked_in'
+            LEFT JOIN reservations r ON g.guest_id = r.guest_id
             LEFT JOIN rooms rm ON r.room_id = rm.room_id
             WHERE CONCAT(g.first_name,' ',g.last_name) LIKE ?
-            ORDER BY r.check_in DESC
+            ORDER BY r.status='checked_in' DESC, r.check_in DESC
             LIMIT 1
         ");
-        $stmt->execute(["%$val%"]);
+        $stmt->execute(["%$guest_input%"]);
     }
     if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $guest = $row;
@@ -50,11 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($order[$id])) {
             $order[$id]['qty'] += $qty;
         } else {
-            $order[$id] = [
-                'name' => $name,
-                'price' => $price,
-                'qty' => $qty
-            ];
+            $order[$id] = ['name'=>$name,'price'=>$price,'qty'=>$qty];
         }
     }
 
@@ -73,23 +69,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $items_str = implode(', ', $items);
         $qty_str = implode(', ', $item_quantities);
+        $delivery_type = $_POST['order_type'] === 'Room Service' ? 'Room Service' : 'Restaurant';
+        $room_number = $delivery_type === 'Room Service' ? ($_POST['room_number'] ?? null) : null;
+        $table_number = $delivery_type === 'Restaurant' ? ($_POST['table_number'] ?? 1) : null;
 
         $stmtInsert = $conn->prepare("
             INSERT INTO kitchen_orders 
             (order_id, order_type, status, table_number, guest_name, guest_id, item, total_amount, created_at, updated_at, room_number, quantity) 
-            VALUES (?,?,?,?,?,?,?,?,NOW(),?, ?,?)
+            VALUES (?,?,?,?,?,?,?,?,NOW(),NOW(),?,?)
         ");
         $stmtInsert->execute([
             $order_id,
-            'Restaurant',
+            $delivery_type,
             'preparing',
-            1,
-            $guest['first_name'].' '.$guest['last_name'],
+            $table_number,
+            $guest['first_name'].' '.$guest['last_name'] ?? '',
             $guest['guest_id'] ?? null,
             $items_str,
             $total,
-            date('Y-m-d H:i:s'),
-            $guest['room_number'] ?? null,
+            $room_number,
             $qty_str
         ]);
 
@@ -101,8 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ");
             $stmtBilling->execute([
                 $guest['guest_id'] ?? null,
-                $guest['first_name'].' '.$guest['last_name'],
-                'Restaurant',
+                $guest['first_name'].' '.$guest['last_name'] ?? '',
+                $delivery_type,
                 $item['name'],
                 $order_id,
                 $item['price'],
@@ -142,6 +140,10 @@ $food_items_stmt = $conn->prepare("
 ");
 $food_items_stmt->execute();
 $food_items = $food_items_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$rooms_stmt = $conn->prepare("SELECT room_number FROM rooms WHERE status='available' ORDER BY room_number ASC");
+$rooms_stmt->execute();
+$rooms = $rooms_stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -189,13 +191,13 @@ $food_items = $food_items_stmt->fetchAll(PDO::FETCH_ASSOC);
   <div class="order-list">
     <?php if ($guest): ?>
       <p>Guest: <?= htmlspecialchars($guest['first_name'].' '.$guest['last_name']) ?> | <?= !empty($guest['room_number']) ? 'R'.$guest['room_number'] : '-' ?></p>
-    <?php elseif (isset($_GET['guest'])): ?>
+    <?php elseif ($guest_input): ?>
       <p class="error">Guest not found</p>
     <?php endif; ?>
     <p>Order ID: <?= $order_id ?></p>
     <div class="guest-bar">
       <form method="get" class="guest-form">
-        <input type="text" name="guest" class="guest-input" placeholder="Enter Guest ID or Name" value="<?= htmlspecialchars($_GET['guest'] ?? '') ?>">
+        <input type="text" name="guest" class="guest-input" placeholder="Enter Guest ID or Name" value="<?= htmlspecialchars($guest_input ?? '') ?>">
         <button type="submit" class="guest-btn">Load Guest</button>
       </form>
       <div style="display:flex; gap:5px;">
@@ -230,7 +232,7 @@ $food_items = $food_items_stmt->fetchAll(PDO::FETCH_ASSOC);
       <input type="hidden" name="guest_id" value="<?= $guest['guest_id'] ?? '' ?>">
       <input type="hidden" name="guest_name" value="<?= $guest ? htmlspecialchars($guest['first_name'].' '.$guest['last_name']) : '' ?>">
       <input type="hidden" name="order_type" id="order_type" value="Restaurant">
-      <input type="hidden" name="room_number" id="room_number_input" value="<?= !empty($guest['room_number']) ? $guest['room_number'] : '' ?>">
+      <input type="hidden" name="room_number" id="room_number_input" value="<?= !empty($guest['room_number']) ? htmlspecialchars($guest['room_number']) : '' ?>">
       <div class="notes-section">
         <label for="order_notes">Order Notes:</label>
         <textarea name="order_notes" id="order_notes" rows="3" placeholder="Add any notes for the order here..."></textarea>
@@ -245,7 +247,12 @@ $food_items = $food_items_stmt->fetchAll(PDO::FETCH_ASSOC);
       </div>
       <div class="form-row" id="room">
         <label>Room:</label>
-        <input type="text" id="room_number_display" value="<?= !empty($guest['room_number']) ? htmlspecialchars($guest['room_number']) : '' ?>" readonly>
+        <select name="room_number" id="room_number_select">
+          <option value="" disabled selected>Select Room</option>
+          <?php foreach($rooms as $r): ?>
+            <option value="<?= htmlspecialchars($r['room_number']) ?>" <?= (!empty($guest['room_number']) && $guest['room_number']==$r['room_number']) ? 'selected' : '' ?>><?= htmlspecialchars($r['room_number']) ?></option>
+          <?php endforeach; ?>
+        </select>
       </div>
       <div class="form-row" id="table">
         <label>Table:</label>
@@ -298,16 +305,19 @@ delivery.onchange = () => {
     if(delivery.value === 'Room Service') {
         room.classList.add('show');
         table.classList.remove('show');
-    } else {
+    } else if(delivery.value === 'Restaurant') {
         table.classList.add('show');
         room.classList.remove('show');
+    } else {
+        room.classList.remove('show');
+        table.classList.remove('show');
     }
 };
 window.addEventListener('DOMContentLoaded', () => {
     if(delivery.value === 'Room Service') {
         room.classList.add('show');
         table.classList.remove('show');
-    } else {
+    } else if(delivery.value === 'Restaurant') {
         table.classList.add('show');
         room.classList.remove('show');
     }
