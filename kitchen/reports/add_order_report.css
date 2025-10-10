@@ -1,0 +1,106 @@
+body, html {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('/hotel/kitchen/image/hotel_room.jpg') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    color: #FFFFFF;
+}
+
+.overlay {
+    background-color: rgba(245, 245, 220, 0.85);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px 0;
+}
+
+.container {
+    background-color: #1A237E;
+    width: 100%;
+    max-width: 600px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    color: #F5F5DC;
+}
+
+header h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    color: #F5F5DC;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+label {
+    font-weight: bold;
+    color: #F5F5DC;
+}
+
+input, select, textarea {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #f5f5dc;
+    color: #000;
+}
+
+input[readonly] {
+    background: #e0e0d1;
+    cursor: not-allowed;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.module-btn {
+    background-color: #F5F5DC;
+    color: #1A237E;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.3s, color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    flex: 1;
+}
+
+.module-btn:hover {
+    background-color: #d6d6b0;
+    color: #0d144d;
+}
+
+.alert {
+    padding: 12px;
+    background: #4CAF50;
+    color: #fff;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.button-group button, .button-group a {
+    flex: 1;
+}
