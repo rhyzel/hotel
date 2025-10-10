@@ -1,29 +1,56 @@
 <?php
 include '../db.php';
 
+$selected_month = $_GET['month'] ?? '';
 $search = $_GET['search'] ?? '';
-$search_sql = $search ? "AND (first_name LIKE '%$search%' OR last_name LIKE '%$search%' OR staff_id LIKE '%$search%')" : '';
-$result = $conn->query("SELECT * FROM staff WHERE position_name NOT IN ('CEO','COO') $search_sql ORDER BY staff_id DESC");
+$selected_position = $_GET['position'] ?? '';
 
-if(isset($_POST['save_performance'])){
-    $staff_id = $_POST['staff_id'];
-    $score = $_POST['score'];
-    $remarks = $_POST['remarks'];
+$positions = [
+    'Front Office Manager','Assistant Front Office Manager','Concierge','Room Attendant','Laundry Supervisor',
+    'Assistant Housekeeper','Cashier','Bartender','Baker','Sous Chef','F&B Manager','Chef de Partie',
+    'Demi Chef de Partie','Assistant F&B Manager','Waiter / Waitress','Restaurant Manager','Chief Engineer',
+    'Assistant Engineer','Inventory Manager','Inventory Inspector'
+];
 
-    $stmt = $conn->prepare("INSERT INTO staff_performance (staff_id, score, remarks, created_at) VALUES (?, ?, ?, NOW())");
-    $stmt->bind_param("sds", $staff_id, $score, $remarks);
-    $stmt->execute();
-    header("Location: staff_performance.php");
-    exit;
+$months_result = $conn->query("SELECT DISTINCT DATE_FORMAT(sp.created_at, '%Y-%m') AS month 
+                               FROM staff_performance sp
+                               JOIN staff s ON sp.staff_id = s.staff_id
+                               ORDER BY month DESC");
+$months = [];
+while($m = $months_result->fetch_assoc()){
+    $months[] = $m['month'];
+}
+if(!$selected_month){
+    $current_month = date('Y-m');
+    $selected_month = in_array($current_month, $months) ? $current_month : ($months[0] ?? $current_month);
 }
 
-function getLastMonthPerformance($conn, $staff_id) {
-    $stmt = $conn->prepare("SELECT score, remarks, created_at FROM staff_performance WHERE staff_id=? AND MONTH(created_at)=MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH)) AND YEAR(created_at)=YEAR(DATE_SUB(NOW(), INTERVAL 1 MONTH)) ORDER BY created_at DESC LIMIT 1");
-    $stmt->bind_param("s", $staff_id);
-    $stmt->execute();
-    $res = $stmt->get_result()->fetch_assoc();
-    return $res ? $res : ['score'=>'-', 'remarks'=>'-'];
+$search_param1 = "%$search%";
+$search_param2 = "%$search%";
+
+if($selected_position !== ''){
+    $query = "SELECT s.staff_id, s.first_name, s.last_name, s.position_name,
+                     sp.score, sp.remarks, sp.created_at
+              FROM staff s
+              LEFT JOIN staff_performance sp 
+              ON s.staff_id = sp.staff_id AND DATE_FORMAT(sp.created_at, '%Y-%m') = ?
+              WHERE (s.first_name LIKE ? OR s.last_name LIKE ?)
+              AND s.position_name = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ssss", $selected_month, $search_param1, $search_param2, $selected_position);
+} else {
+    $query = "SELECT s.staff_id, s.first_name, s.last_name, s.position_name,
+                     sp.score, sp.remarks, sp.created_at
+              FROM staff s
+              LEFT JOIN staff_performance sp 
+              ON s.staff_id = sp.staff_id AND DATE_FORMAT(sp.created_at, '%Y-%m') = ?
+              WHERE (s.first_name LIKE ? OR s.last_name LIKE ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("sss", $selected_month, $search_param1, $search_param2);
 }
+
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -31,64 +58,59 @@ function getLastMonthPerformance($conn, $staff_id) {
 <head>
 <meta charset="UTF-8">
 <title>Staff Performance</title>
-<link rel="stylesheet" href="../css/staff_perfomance.css">
-
-<link rel="stylesheet" href="fontawesome-free-7.0.1-web/css/all.min.css">
+<link rel="stylesheet" href="../css/staff_performance.css">
 </head>
 <body>
 <div class="container">
-    <h1 style="text-align:center;">Staff Performance</h1>
+<h1>Staff Performance</h1>
 
-    <div class="top-bar">
-        <a href="employee_management.php" class="back-button"><i class="fas fa-arrow-left"></i> Back</a>
-        <form method="GET" class="search-form">
-            <input type="text" name="search" placeholder="Search employees..." value="<?= htmlspecialchars($search) ?>">
-            <button type="submit">Search</button>
-        </form>
-    </div>
+<div class="controls">
+  <a href="../employee_management/employee_management.php" class="back">Back</a>
+  <form method="get">
+    <input type="text" name="search" placeholder="Search employee" value="<?= htmlspecialchars($search) ?>">
+    <select name="month">
+      <?php foreach($months as $month_val):
+          $selected = ($month_val==$selected_month) ? 'selected' : '';
+      ?>
+      <option value="<?= $month_val ?>" <?= $selected ?>><?= date('F Y', strtotime($month_val.'-01')) ?></option>
+      <?php endforeach; ?>
+    </select>
+    <select name="position">
+      <option value="">All Positions</option>
+      <?php foreach($positions as $name):
+          $selected = ($name==$selected_position) ? 'selected' : '';
+      ?>
+      <option value="<?= $name ?>" <?= $selected ?>><?= $name ?></option>
+      <?php endforeach; ?>
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+</div>
 
-    <h2>All Staff</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Employee ID</th>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Department</th>
-                <th>Last Month Score</th>
-                <th>Last Month Remarks</th>
-                <th>New Score</th>
-                <th>New Remarks</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while($row=$result->fetch_assoc()): 
-                $last_perf = getLastMonthPerformance($conn, $row['staff_id']);
-            ?>
-            <tr>
-                <td><?= $row['staff_id'] ?></td>
-                <td><?= $row['first_name'].' '.$row['last_name'] ?></td>
-                <td><?= $row['position_name'] ?></td>
-                <td><?= $row['department_name'] ?></td>
-                <td><?= $last_perf['score'] ?></td>
-                <td><?= $last_perf['remarks'] ?></td>
-                <td>
-                    <form method="POST" class="performance-form">
-                        <input type="hidden" name="staff_id" value="<?= $row['staff_id'] ?>">
-                        <input type="number" step="0.01" name="score" placeholder="Score" required>
-                </td>
-                <td>
-                        <input type="text" name="remarks" placeholder="Remarks">
-                </td>
-                <td>
-                        <button type="submit" name="save_performance">Save</button>
-                    </form>
-                </td>
-            </tr>
-            <?php endwhile; ?>
-        </tbody>
-    </table>
+<table>
+  <thead>
+    <tr>
+      <th>Staff ID</th>
+      <th>Name</th>
+      <th>Position</th>
+      <th>Score</th>
+      <th>Remarks</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php while($row = $result->fetch_assoc()): ?>
+    <tr>
+      <td><?= htmlspecialchars($row['staff_id']) ?></td>
+      <td><?= htmlspecialchars($row['first_name'].' '.$row['last_name']) ?></td>
+      <td><?= htmlspecialchars($row['position_name'] ?? 'N/A') ?></td>
+      <td><?= htmlspecialchars($row['score']) ?></td>
+      <td><?= htmlspecialchars($row['remarks']) ?></td>
+      <td><?= date('Y-m-d', strtotime($row['created_at'])) ?></td>
+    </tr>
+    <?php endwhile; ?>
+  </tbody>
+</table>
 </div>
 </body>
 </html>

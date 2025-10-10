@@ -29,15 +29,15 @@ $past_overtime = $conn->query("
     WHERE s.position_name NOT IN ('CEO','COO')
     ORDER BY o.overtime_date DESC, s.first_name, s.last_name
 ");
-
 $attendance = $conn->query("
     SELECT a.attendance_date, s.staff_id, s.first_name, s.last_name,
-           a.start_time, a.end_time, TIMESTAMPDIFF(HOUR, a.start_time, a.end_time) AS total_hours
+           a.time_in, a.time_out, TIMESTAMPDIFF(HOUR, a.time_in, a.time_out) AS total_hours
     FROM attendance a
     JOIN staff s ON a.staff_id = s.staff_id
     WHERE s.position_name NOT IN ('CEO','COO') AND a.attendance_date='$date'
     ORDER BY s.first_name, s.last_name
 ");
+
 ?>
 
 <!DOCTYPE html>
