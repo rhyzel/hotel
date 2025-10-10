@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+    scroll-behavior: smooth;
+}
+
+html, body {
+    height: 100%;
+    min-height: 100vh;
+    background: url('http://localhost/hotel/hr/payroll/hotel.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #4B5320;
+}
+
+.overlay {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 15px;
+    background: rgba(201, 214, 193, 0.25);
+    background-attachment: fixed;
+}
+
+.container {
+    width: 100%;
+    max-width: 1400px;
+}
+
+.page-header {
+    background-color: #C9D6C1;
+    padding: 25px 20px;
+    border-radius: 12px;
+    border: 3px dotted #4B5320;
+    box-shadow: 0 4px 12px rgba(75, 83, 32, 0.1);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.page-header h2 {
+    font-size: 2.5rem;
+    color: #4B5320;
+    margin-bottom: 5px;
+}
+
+.page-header p {
+    font-size: 1.2rem;
+    color: #4B5320;
+}
+
+.header-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.nav-btn, button {
+    text-decoration: none;
+    background-color: #FFFCE3;
+    color: #4B5320;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 2px solid #4B5320;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.nav-btn:hover, button:hover {
+    background-color: #7F946C;
+    color: #FFFCE3;
+    border: 2px solid #4B5320;
+}
+
+.filter-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-form select,
+.filter-form input,
+.filter-form button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #9CAF88;
+    font-size: 1rem;
+    color: #4B5320;
+    background-color: #FFFCE3;
+}
+
+.table-wrapper {
+    width: 100%;
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #FFFCE3;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(75, 83, 32, 0.1);
+    table-layout: fixed;
+    word-wrap: break-word;
+    border: 2px dotted #4B5320;
+}
+
+thead {
+    background-color: #F5F5DC;
+    color: #050505;
+}
+
+th, td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px dotted #4B5320;
+    border-right: 1px dotted #4B5320;
+    color: #4B5320;
+    font-size: 0.95rem;
+    white-space: normal;
+    word-break: break-word;
+}
+
+th:last-child, td:last-child {
+    border-right: none;
+}
+
+th {
+    font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+    background-color: rgba(156, 175, 136, 0.2);
+}
+
+tbody tr:nth-child(odd) {
+    background-color: rgba(245, 245, 220, 0.6);
+}
+
+tbody tr:hover {
+    background-color: rgba(75, 83, 32, 0.05);
+}
+
+.staff-link {
+    text-decoration: none;
+    color: #4B5320;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.staff-link:hover {
+    color: #5A704F;
+}
+
+@media(max-width: 1200px) {
+    .page-header h2 { font-size: 2rem; }
+    .page-header p { font-size: 1rem; }
+    th, td { font-size: 0.9rem; padding: 10px 8px; }
+}
+
+@media(max-width: 992px) {
+    table { font-size: 0.85rem; }
+    th, td { padding: 8px 6px; }
+}
+
+@media(max-width: 768px) {
+    .header-controls { flex-direction: column; gap: 10px; }
+    .filter-form { flex-direction: column; gap: 8px; }
+    table { font-size: 0.8rem; }
+    th, td { padding: 6px 4px; }
+}
+
+@media(max-width: 480px) {
+    .page-header h2 { font-size: 1.8rem; }
+    .page-header p { font-size: 0.75rem; }
+    th, td { font-size: 0.7rem; padding: 4px 3px; }
+}

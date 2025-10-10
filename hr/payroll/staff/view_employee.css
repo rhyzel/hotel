@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', sans-serif;
+    scroll-behavior: smooth;
+    color: #4B5320;
+}
+
+html, body {
+    height: 100%;
+    background: url('../hotel.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 30px 15px;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(201, 214, 193, 0.2);
+    z-index: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    background: rgba(245, 245, 220, 0.99);
+    border-radius: 12px;
+    padding: 20px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    box-shadow: 0 4px 10px rgba(75,83,32,0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(201, 214, 193, 0.9);
+    padding: 25px 20px;
+    border-radius: 12px;
+    border: 3px dotted #4B5320;
+    box-shadow: 0 4px 12px rgba(75, 83, 32, 0.1);
+    text-align: center;
+    gap: 10px;
+}
+
+.profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #4B5320;
+    color: #FFFCE3;
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+}
+
+.profile-header h1 {
+    color: #4B5320;
+    font-size: 2rem;
+}
+
+.profile-header p {
+    color: #4B5320;
+    font-size: 1rem;
+}
+
+.tab {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.tab button, .tab a.back-btn {
+    background-color: #4B5320;
+    color: #FFFCE3;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.tab button:hover, .tab button.active, .tab a.back-btn:hover {
+    background-color: #7F946C;
+    color: #FFFCE3;
+}
+
+.tabcontent {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.personal-field, .job-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.personal-field.full-width {
+    width: 100%;
+}
+
+label {
+    font-weight: 600;
+    color: #4B5320;
+}
+
+input, select {
+    padding: 8px 12px;
+    border: 1px solid #4B5320;
+    border-radius: 6px;
+    background-color: #FFFCE3;
+    color: #4B5320;
+}
+
+.update-btn-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.update-btn {
+    background-color: #4B5320;
+    color: #FFFCE3;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.update-btn:hover {
+    background-color: #7F946C;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #FFFCE3;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(75,83,32,0.1);
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px dotted #4B5320;
+    color: #4B5320;
+}
+
+thead {
+    background-color: #F5F5DC;
+    color: #050505;
+}
+
+tbody tr:nth-child(even) {
+    background-color: rgba(156, 175, 136, 0.2);
+}
+
+tbody tr:nth-child(odd) {
+    background-color: rgba(245, 245, 220, 0.6);
+}
+
+tbody tr:hover {
+    background-color: rgba(75,83,32,0.05);
+}
+
+@media (max-width: 768px) {
+    .tab { flex-direction: column; gap: 8px; }
+    .personal-field, .job-field { width: 100%; }
+}
+
+@media (max-width: 480px) {
+    .profile-header h1 { font-size: 1.5rem; }
+    th, td, input, select, button { font-size: 0.85rem; padding: 6px 8px; }
+}
+
+h3 {
+    text-align: center;
+    color: #4B5320;
+    margin-bottom: 10px;
+}

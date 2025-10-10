@@ -1,0 +1,239 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+html, body {
+    height: 100%;
+    background: url('http://localhost/hotel/hr/payroll/hotel.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #4B5320;
+}
+
+.overlay {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 15px;
+    background: rgba(201, 214, 193, 0.25);
+}
+
+.container {
+    width: 100%;
+    max-width: 1300px;
+}
+
+.profile-header {
+    background: #C9D6C1;
+    padding: 20px;
+    border-radius: 12px;
+    border: 3px dotted #4B5320;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.profile-header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.tools-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.filter-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 5px;
+}
+
+.nav-btn,
+.filter-form button,
+.action-btn,
+.export-form button,
+.view-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 15px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    border: 2px solid #4B5320;
+    background: #FFFCE3;
+    color: #4B5320;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.nav-btn:hover,
+.filter-form button:hover,
+.action-btn.approve:hover,
+.view-btn:hover {
+    background-color: #4B5320;
+    color: #FFFCE3;
+}
+
+.action-btn.approve {
+    background-color: #4B5320;
+    color: #FFFCE3;
+    border: 2px solid #4B5320;
+}
+
+.action-btn.reject {
+    background-color: #C9D6C1;
+    color: #4B5320;
+    border: 2px solid #9CAF88;
+}
+
+.action-btn.reject:hover {
+    background-color: #9CAF88;
+    color: #FFFCE3;
+}
+
+.view-btn {
+    background-color: #FFFCE3;
+    color: #4B5320;
+    border: 2px solid #4B5320;
+    padding: 5px 10px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.filter-form select,
+.filter-form input {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 2px solid #4B5320;
+    background: #FFFCE3;
+    color: #4B5320;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #FFFCE3;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(75, 83, 32, 0.1);
+    overflow: hidden;
+}
+
+thead {
+    background: #C9D6C1;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px dotted #4B5320;
+}
+
+th {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+    background: rgba(156, 175, 136, 0.2);
+}
+
+tbody tr:nth-child(odd) {
+    background: rgba(201, 214, 193, 0.4);
+}
+
+tbody tr:hover {
+    background: rgba(75, 83, 32, 0.05);
+}
+
+tbody td a {
+    color: #4B5320;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+tbody td a:hover {
+    color: #2f3811;
+}
+
+.action-btn-wrapper {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.action-btn-wrapper .action-btn {
+    flex: 1;
+    min-width: 90px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.3s;
+}
+
+.action-btn-wrapper .action-btn i {
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .profile-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .tools-row,
+    .filter-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    th, td {
+        font-size: 0.9rem;
+    }
+
+    .action-btn-wrapper {
+        flex-direction: column;
+    }
+
+    .action-btn-wrapper .action-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .filter-form {
+        gap: 5px;
+    }
+
+    .filter-form select,
+    .filter-form input {
+        width: 100%;
+    }
+}

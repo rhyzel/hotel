@@ -1,0 +1,247 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('/fonts/roboto/Roboto-Regular.woff2') format('woff2'),
+         url('/fonts/roboto/Roboto-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('/fonts/roboto/Roboto-Bold.woff2') format('woff2'),
+         url('/fonts/roboto/Roboto-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+html, body {
+    height: 100%;
+    background: url('http://localhost/hotel/hr/payroll/hotel.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #4B5320;
+}
+
+.overlay {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    padding: 40px 15px;
+    background: rgba(201, 214, 193, 0.25);
+}
+
+.container {
+    width: 100%;
+    max-width: 1300px;
+}
+
+.profile-header {
+    background: #C9D6C1;
+    padding: 20px;
+    border-radius: 12px;
+    border: 3px dotted #4B5320;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.header-flex h1 {
+    font-size: 2rem;
+    color: #4B5320;
+}
+
+.tools-row {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.nav-btn,
+.export-btn,
+.search-form button,
+.file-deduction-btn {
+    background-color: #FFFCE3;
+    color: #4B5320;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 2px solid #4B5320;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.nav-btn:hover,
+.export-btn:hover,
+.search-form button:hover,
+.file-deduction-btn:hover {
+    background-color: #7F946C;
+    color: #FFFCE3;
+}
+
+.search-form {
+    display: flex;
+    gap: 10px;
+}
+
+.search-form input {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #9CAF88;
+    background: #FFFCE3;
+    color: #4B5320;
+    font-size: 1rem;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #FFFCE3;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(75, 83, 32, 0.1);
+}
+
+thead {
+    background: #F5F5DC;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px dotted #4B5320;
+}
+
+th {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+    background: rgba(156, 175, 136, 0.2);
+}
+
+tbody tr:nth-child(odd) {
+    background: rgba(245, 245, 220, 0.6);
+}
+
+tbody tr:hover {
+    background: rgba(75, 83, 32, 0.05);
+}
+
+a {
+    color: #4B5320;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #5A704F;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background: #FFFCE3;
+    padding: 25px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.modal-content h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #4B5320;
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 10px;
+    font-weight: 600;
+    color: #4B5320;
+}
+
+.modal-content select,
+.modal-content input,
+.modal-content textarea {
+    width: 100%;
+    margin-top: 5px;
+    padding: 8px;
+    border: 1px solid #9CAF88;
+    border-radius: 6px;
+    background: #FFFCE3;
+    color: #4B5320;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.submit-btn,
+.close-btn {
+    flex: 1;
+    margin: 0 5px;
+    background-color: #4B5320;
+    color: #FFFCE3;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.close-btn {
+    background: #999;
+}
+
+.submit-btn:hover {
+    background-color: #36472F;
+}
+
+.close-btn:hover {
+    background: #777;
+}
+
+@media(max-width: 768px) {
+    .header-flex h1 { font-size: 1.6rem; }
+    .tools-row { flex-direction: column; }
+    th, td { font-size: 0.9rem; }
+}
+
+@media(max-width: 480px) {
+    .search-form { flex-direction: column; }
+}

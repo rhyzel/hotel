@@ -1,0 +1,226 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    font-family: 'Outfit', sans-serif;
+}
+
+html, body {
+    min-height: 100vh;
+    background: url('http://localhost/hotel/hr/payroll/hotel.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #4B5320;
+}
+
+.overlay {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 15px;
+    background: rgba(201, 214, 193, 0.25);
+    background-attachment: fixed;
+}
+
+.container {
+    max-width: 1400px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.profile-header {
+    background: #c9d6c1de;
+    padding: 25px 20px;
+    border-radius: 12px;
+    border: 1px dotted #4B5320;
+    box-shadow: 0 2px 6px rgba(75, 83, 32, 0.2);
+}
+
+.header-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.header-flex h1 {
+    color: #36472F;
+    font-size: 2.3rem;
+    text-align: center;
+    text-transform: uppercase;
+    padding: 8px 12px;
+}
+
+.tools-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.top-margin {
+    margin-top: 10px;
+}
+
+.nav-btn, .export-btn {
+    background-color: #FFFCE3;
+    color: #4B5320;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    border: 2px solid #4B5320;
+}
+
+.nav-btn:hover, .export-btn:hover {
+    background-color: #7F946C;
+}
+
+.filter-form select {
+    padding: 8px 12px;
+    border: 1px dotted #4B5320;
+    border-radius: 6px;
+    background-color: #FFFCE3;
+    color: #36472F;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #FFFCE3;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border: 1px dotted #4B5320;
+}
+
+thead {
+    background: #fefffb;
+    color: #050505;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px dotted #4B5320;
+    color: #36472F;
+}
+
+thead th {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+tbody tr:nth-child(even) {
+    background: rgba(156, 175, 136, 0.2);
+}
+
+tbody tr:nth-child(odd) {
+    background: rgba(245, 245, 220, 0.6);
+}
+
+tbody tr:hover {
+    background: rgba(75, 83, 32, 0.05);
+}
+
+a {
+    color: #36472F;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #5A704F;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+.close-btn {
+    background: #4B5320;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+}
+
+.proof-link {
+    margin-left: 5px;
+    font-size: 0.9rem;
+    color: #007BFF;
+}
+
+@media(max-width: 1200px) {
+    .header-flex h1 {
+        font-size: 2rem;
+    }
+}
+
+@media(max-width: 768px) {
+    .header-flex {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .tools-row {
+        gap: 12px;
+        justify-content: center;
+    }
+}
+
+@media(max-width: 480px) {
+    .header-flex h1 {
+        font-size: 1.5rem;
+    }
+    th, td {
+        font-size: 0.85rem;
+        padding: 8px 10px;
+    }
+    .tools-row {
+        gap: 8px;
+        justify-content: center;
+    }
+    .filter-form select {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+    }
+}
