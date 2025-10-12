@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $totalRemaining += ($i['amount'] - $i['partial_payment']);
                     }
                     foreach($allItems as $itemData){
-                        if(isset($itemData['item']) && $itemData['item'] === $item){
+                        if($itemData['item'] === $item){
                             $refundAmount = $itemData['amount'] - $itemData['partial_payment'];
                             $newRemaining = max(0, $totalRemaining - $refundAmount);
                             $stmtUpdateOriginal = $pdo->prepare("
@@ -128,9 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -260,7 +258,7 @@ document.getElementById('items').dispatchEvent(new Event('change'));
 
 document.getElementById('complain_reason').addEventListener('change', function(){
 document.getElementById('other_note').style.display = this.value === 'Other' ? 'block' : 'none';
-}); </script>
-
+});
+</script>
 </body>
 </html>

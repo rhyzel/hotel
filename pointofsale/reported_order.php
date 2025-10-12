@@ -37,12 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $allItems = $stmtOrderGB->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($items as $item) {
-            $exists = $pdo->prepare("SELECT id FROM reported_items WHERE order_id=? AND reported_item=?");
+            $exists = $pdo->prepare("SELECT id FROM reported_items WHERE order_id=? AND item=?");
             $exists->execute([$order_id, $item]);
             if (!$exists->fetch()) {
                 $itemData = array_values(array_filter($allItems, fn($i) => $i['item'] === $item))[0] ?? null;
                 if ($itemData) {
-                    $stmt = $pdo->prepare("INSERT INTO reported_items (order_id, guest_id, guest_name, reported_item, complain_reason, resolution, assigned_cashier, status, reported_at, order_type) VALUES (?,?,?,?,?,?,?,?,NOW(),?)");
+                    $stmt = $pdo->prepare("INSERT INTO reported_items (order_id, guest_id, guest_name, item, complain_reason, resolution, assigned_cashier, status, reported_at, order_type) VALUES (?,?,?,?,?,?,?,?,NOW(),?)");
                     $stmt->execute([
                         $order_id,
                         $itemData['guest_id'],
@@ -61,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>

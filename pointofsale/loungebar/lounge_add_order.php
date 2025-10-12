@@ -81,7 +81,7 @@ foreach($receipt_items as $item){
         $item['qty'],
         $item['subtotal'],
         $current_payment_option,
-        $current_payment_method,
+        $current_payment_method ?? 'Cash',
         $item_partial_payment,
         $item_remaining
     ]);
@@ -104,7 +104,7 @@ $receipt_date = date('F j, Y, g:i A');
 <p>Date: <?= htmlspecialchars($receipt_date) ?></p>
 <p>Guest: <?= htmlspecialchars($guest_name) ?></p>
 <p>Order Type: <?= htmlspecialchars($order_type) ?></p>
-<p>Payment Method: <?= htmlspecialchars($current_payment_method ?? 'To be billed') ?></p>
+<p>Payment Method: <?= htmlspecialchars($current_payment_method ?? 'Cash') ?></p>
 <?php if(!empty($order_notes)): ?><p>Notes: <?= htmlspecialchars($order_notes) ?></p><?php endif; ?>
 
 <table>

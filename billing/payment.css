@@ -1,0 +1,208 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('hotel_room.jpg') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    color: #3b2e2c;
+}
+
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: rgba(245, 240, 235, 0.95);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #4b3621;
+    letter-spacing: 1px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background: #f3ebe0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+table th, table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #d1bfa7;
+    text-align: left;
+    font-size: 15px;
+}
+
+table th {
+    background-color: #d7b49e;
+    color: #3b2e2c;
+}
+
+.summary-box {
+    background: #fffaf5;
+    border: 1px solid #d1bfa7;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+#grand_total, #partial_total, #after_partial {
+    background: #f5e7dc;
+    border: 1px solid #d1bfa7;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 15px;
+}
+
+#premium_check {
+    margin-right: 8px;
+}
+
+.tooltip {
+    position: relative;
+    cursor: pointer;
+    color: #6b4c3b;
+    font-weight: bold;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 220px;
+    background-color: #4b3621;
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1;
+    top: 25px;
+    left: 0;
+    font-size: 13px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+select, input[type="number"] {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #d1bfa7;
+    margin-top: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+    background-color: #fffaf5;
+}
+
+#cash_input {
+    margin-top: 10px;
+    padding: 12px;
+    background: #f3ebe0;
+    border-radius: 8px;
+    border: 1px solid #d1bfa7;
+}
+
+.button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.button-row button,
+.button-row a {
+    width: 100%;
+    text-align: center;
+    padding: 12px 0;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.button-row button {
+    background-color: #6b4c3b;
+    color: #fff;
+    border: none;
+}
+
+.button-row button:hover {
+    background-color: #a6785d;
+}
+
+.button-row a {
+    background-color: #6b4c3b;
+    color: #fff;
+}
+
+.button-row a:hover {
+    background-color: #a6785d;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background: #fffaf5;
+    padding: 25px 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    width: 320px;
+    text-align: center;
+}
+
+.modal-content p {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #3b2e2c;
+}
+
+.modal-content button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    margin: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+#confirmYes {
+    background-color: #6b4c3b;
+    color: white;
+}
+
+#confirmYes:hover {
+    background-color: #a6785d;
+}
+
+#confirmNo {
+    background-color: #d1bfa7;
+    color: #3b2e2c;
+}
+
+#confirmNo:hover {
+    background-color: #c3aa90;
+}

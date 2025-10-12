@@ -4,17 +4,21 @@ include '../db.php';
 $vacant_sql = "
     SELECT 
         p.position_name,
-        GROUP_CONCAT(DISTINCT p.department_name ORDER BY p.department_name SEPARATOR ', ') AS departments,
-        SUM(p.required_count) AS total_required,
-        (SUM(p.required_count) - IFNULL(
+        p.department_name AS departments,
+        p.required_count AS total_required,
+        (p.required_count - IFNULL(
             (SELECT COUNT(*) FROM staff s 
              WHERE s.position_name = p.position_name 
              AND s.employment_status IN ('Active','Probation')),0)
         ) AS vacant_slots
     FROM positions p
-    GROUP BY p.position_name
-    HAVING vacant_slots > 0
+    WHERE (p.required_count - IFNULL(
+            (SELECT COUNT(*) FROM staff s 
+             WHERE s.position_name = p.position_name 
+             AND s.employment_status IN ('Active','Probation')),0)
+        ) > 0
 ";
+
 $result = $conn->query($vacant_sql);
 
 $positions = [];

@@ -30,7 +30,7 @@
   <i class="fas fa-cash-register"></i>
   <span>Point of Sale</span>
 </a>
-<a href="../billing/billing_dashboard.php" class="module">
+<a href="../billing/billing.php" class="module">
   <i class="fas fa-file-invoice-dollar"></i>
   <span>Billing & Payments</span>
 </a>

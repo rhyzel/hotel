@@ -57,6 +57,17 @@ foreach ($order as $id => $item) {
     $price = floatval($item['price']);
     $subtotal = $price * $qty;
 
+    $item_partial = 0;
+    $item_remaining = $subtotal;
+
+    if ($payment_option === 'Partial Payment' && $total > 0) {
+        $item_partial = ($subtotal / $total) * $partial_payment;
+        $item_remaining = $subtotal - $item_partial;
+    } elseif ($payment_option === 'Paid') {
+        $item_partial = $subtotal;
+        $item_remaining = 0;
+    }
+
     $stmt = $conn->prepare("UPDATE inventory SET quantity_in_stock = quantity_in_stock - ? WHERE item_id = ?");
     $stmt->execute([$qty, $item['id'] ?? $id]);
 
@@ -75,8 +86,8 @@ foreach ($order as $id => $item) {
         $qty,
         $payment_option,
         $payment_method,
-        $paid_amount,
-        $remaining_amount,
+        $item_partial,
+        $item_remaining,
         $remaining_amount,
         $total
     ]);
