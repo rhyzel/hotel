@@ -16,24 +16,41 @@ if ($search) {
     $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-if (isset($_POST['submit_refund'])) {
-    $order_id = $_POST['order_id'];
-    $refund_amount = $_POST['refund_amount'];
-    $refund_method = $_POST['refund_method'];
-    $manager_id = $_POST['manager_id'];
-    $reason = $_POST['reason'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $order_id = $_POST['order_id'] ?? '';
+    $item = $_POST['item'] ?? '';
+    $refund_amount = $_POST['refund_amount'] ?? 0;
+    $refund_method = $_POST['refund_method'] ?? '';
+    $staff_id = $_POST['staff_id'] ?? '';
+    $reason = $_POST['reason'] ?? '';
     $other_reason = $_POST['other_reason'] ?? '';
 
-    $stmt = $conn->prepare("SELECT gb.*, CONCAT(g.first_name,' ',g.last_name) as guest_name FROM guest_billing gb JOIN guests g ON g.guest_id=gb.guest_id WHERE gb.order_id=? LIMIT 1");
-    $stmt->execute([$order_id]);
+    if (!$staff_id) {
+        die('Manager must be selected.');
+    }
+
+    $stmt = $conn->prepare("SELECT gb.*, CONCAT(g.first_name,' ',g.last_name) as guest_name 
+        FROM guest_billing gb 
+        JOIN guests g ON g.guest_id=gb.guest_id 
+        WHERE gb.order_id=? AND gb.item=? LIMIT 1");
+    $stmt->execute([$order_id, $item]);
     $transaction = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($transaction && $transaction['payment_option'] !== 'Paid') {
+    if ($transaction) {
         $final_reason = $reason === 'Other' ? $other_reason : $reason;
-        $insert = $conn->prepare("INSERT INTO refunds (guest_id, guest_name, order_id, item, refund_amount, payment_method, status, created_at, updated_at, reason) VALUES (?, ?, ?, ?, ?, ?, 'Pending', NOW(), NOW(), ?)");
-        $insert->execute([$transaction['guest_id'], $transaction['guest_name'], $transaction['order_id'], $transaction['item'], $refund_amount, $refund_method, $final_reason]);
-        $update = $conn->prepare("UPDATE guest_billing SET payment_option='Pending Refund' WHERE order_id=?");
-        $update->execute([$order_id]);
+        $insert = $conn->prepare("INSERT INTO refunds (guest_id, guest_name, order_id, item, refund_amount, payment_method, status, created_at, updated_at, reason, staff_id) VALUES (?, ?, ?, ?, ?, ?, 'Completed', NOW(), NOW(), ?, ?)");
+        $insert->execute([
+            $transaction['guest_id'], 
+            $transaction['guest_name'], 
+            $transaction['order_id'], 
+            $transaction['item'], 
+            $refund_amount, 
+            $refund_method, 
+            $final_reason, 
+            $staff_id
+        ]);
+        $update = $conn->prepare("UPDATE guest_billing SET payment_option='Refunded' WHERE order_id=? AND item=?");
+        $update->execute([$order_id, $item]);
         header("Location: refund.php?search=$search");
         exit;
     }
@@ -47,13 +64,11 @@ if (isset($_POST['submit_refund'])) {
 <title>Refund Transactions</title>
 <link rel="stylesheet" href="refund.css">
 <script>
-function openRefundModal(orderId, guestName, amount, status) {
-    if (status === 'Paid') {
-        alert('Refund processing is disabled for fully paid transactions.');
-        return;
-    }
+function openRefundModal(orderId, guestName, amount, item, status) {
+    if (status === 'Refunded') return;
     document.getElementById('modal').style.display = 'flex';
     document.getElementById('order_id').value = orderId;
+    document.getElementById('item').value = item;
     document.getElementById('guest_info').innerText = guestName;
     document.getElementById('refund_amount').value = amount;
 }
@@ -79,15 +94,12 @@ function showOtherReason(value){
         <div class="subtitle">Refund Transactions</div>
     </div>
 </header>
-
 <form method="get" class="filter-form">
     <a href="billing.php" class="header-btn">Back</a>
     <input type="text" name="search" placeholder="Order ID, Guest ID or Guest Name" value="<?= htmlspecialchars($search) ?>" required>
     <button type="submit">Search</button>
     <a href="refund.php" class="clear-btn">Clear</a>
 </form>
-
-
 <?php if ($transactions): ?>
 <table class="transaction-table">
 <tr>
@@ -115,9 +127,9 @@ function showOtherReason(value){
     <td><?= date('Y-m-d H:i', strtotime($t['created_at'])) ?></td>
     <td>
         <button type="button" 
-            onclick="openRefundModal('<?= $t['order_id'] ?>','<?= htmlspecialchars($t['guest_name']) ?>','<?= $t['amount'] ?>','<?= $t['payment_option'] ?>')" 
-            <?= $t['payment_option']==='Paid'?'disabled style="background:#999;cursor:not-allowed;"':'' ?>>
-            Process Refund
+            onclick="openRefundModal('<?= $t['order_id'] ?>','<?= htmlspecialchars($t['guest_name']) ?>','<?= $t['amount'] ?>','<?= htmlspecialchars($t['item']) ?>','<?= $t['payment_option'] ?>')" 
+            <?= $t['payment_option']==='Refunded'?'disabled style="background:#999;cursor:not-allowed;"':'' ?>>
+            Complete Refund
         </button>
     </td>
 </tr>
@@ -126,7 +138,6 @@ function showOtherReason(value){
 <?php elseif ($search): ?>
 <p style="text-align:center; margin-top:20px;">No transactions found for "<?= htmlspecialchars($search) ?>"</p>
 <?php endif; ?>
-
 <div id="modal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -134,6 +145,7 @@ function showOtherReason(value){
         <p id="guest_info"></p>
         <form method="post">
             <input type="hidden" id="order_id" name="order_id">
+            <input type="hidden" id="item" name="item">
             <label>Refund Amount</label>
             <input type="number" id="refund_amount" name="refund_amount" step="0.01" required>
             <label>Refund Method</label>
@@ -154,12 +166,12 @@ function showOtherReason(value){
             </select>
             <input type="text" id="other_reason" name="other_reason" placeholder="Explain reason" style="display:none; margin-top:5px;">
             <label>Manager Approval</label>
-            <select name="manager_id" required>
+            <select name="staff_id" required>
                 <?php foreach($managers as $m): ?>
-                <option value="<?= $m['staff_id'] ?>"><?= htmlspecialchars($m['name']) ?></option>
+                <option value="<?= htmlspecialchars($m['staff_id']) ?>"><?= htmlspecialchars($m['name']) ?></option>
                 <?php endforeach; ?>
             </select>
-            <button type="submit" name="submit_refund">Submit Refund</button>
+            <button type="submit">Complete Refund</button>
         </form>
     </div>
 </div>
