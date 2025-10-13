@@ -108,78 +108,71 @@ if ($result && $result->num_rows > 0) {
         $net = $gross - $total_deductions;
 
         $check = $conn->prepare("SELECT id, pdf_file FROM payslip WHERE staff_id=? AND month=? AND year=?");
-        $check->bind_param("sss",$staff_id,$month_num,$year);
+        $check->bind_param("sii",$staff_id,$month_num,$year);
         $check->execute();
         $check->store_result();
         $check->bind_result($payslip_id,$pdf_file);
         $check->fetch();
 
-        if($check->num_rows == 0 || isset($_GET['edit']) && $_GET['edit']==$payslip_id){
-            $pdf = new FPDF();
-            $pdf->AddPage();
-            if(file_exists($logo_path)) $pdf->Image($logo_path,10,10,30);
-            $pdf->SetFont('Arial','B',16);
-            $pdf->Cell(0,10,'Hotel La Vista',0,1,'C');
-            $pdf->SetFont('Arial','',12);
-            $pdf->Cell(0,7,"Payslip for $month $year",0,1,'C');
-            $pdf->Ln(10);
-            $pdf->SetFont('Arial','',11);
-            $pdf->Cell(60,7,"Employee ID: ".$staff_id,0,0);
-            $pdf->Cell(0,7,"Employee Name: ".$staff['first_name'].' '.$staff['last_name'],0,1);
-            $pdf->Cell(60,7,"Position: ".$staff['position_name'],0,0);
-            $pdf->Cell(0,7,"Department: ".$staff['department_name'],0,1);
-            $pdf->Cell(60,7,"Hire Date: ".$staff['hire_date'],0,1);
-            $pdf->Ln(5);
-            $pdf->SetFont('Arial','B',11);
-            $pdf->SetFillColor(220,220,220);
-            $pdf->Cell(120,8,"Description",1,0,'C',true);
-            $pdf->Cell(60,8,"Amount (₱)",1,1,'C',true);
-            $pdf->SetFont('Arial','',11);
-            $pdf->Cell(120,7,"Base Salary",1);
-            $pdf->Cell(60,7,number_format($base_salary,2),1,1,'R');
-            $pdf->Cell(120,7,"Worked Salary ($total_hours hrs)",1);
-            $pdf->Cell(60,7,number_format($worked_salary,2),1,1,'R');
-            $pdf->Cell(120,7,"Holiday Pay ($holiday_hours hrs)",1);
-            $pdf->Cell(60,7,number_format($holiday_pay,2),1,1,'R');
-            $pdf->Cell(120,7,"Overtime Pay ($total_ot_hours hrs)",1);
-            $pdf->Cell(60,7,number_format($ot_pay,2),1,1,'R');
-            $pdf->Cell(120,7,"Bonuses/Incentives",1);
-            $pdf->Cell(60,7,number_format($total_bonus,2),1,1,'R');
-            $pdf->Cell(120,7,"Reimbursements",1);
-            $pdf->Cell(60,7,number_format($total_reimburse,2),1,1,'R');
-            $pdf->Cell(120,7,"Gross Pay",1);
-            $pdf->Cell(60,7,number_format($gross,2),1,1,'R');
-            $pdf->Cell(120,7,"SSS Deduction",1);
-            $pdf->Cell(60,7,number_format($deductions['sss'],2),1,1,'R');
-            $pdf->Cell(120,7,"PhilHealth Deduction",1);
-            $pdf->Cell(60,7,number_format($deductions['philhealth'],2),1,1,'R');
-            $pdf->Cell(120,7,"Pag-IBIG Deduction",1);
-            $pdf->Cell(60,7,number_format($deductions['pagibig'],2),1,1,'R');
-            $pdf->Cell(120,7,"Withholding Tax",1);
-            $pdf->Cell(60,7,number_format($deductions['withholding'],2),1,1,'R');
-            $pdf->Cell(120,7,"Other Deductions",1);
-            $pdf->Cell(60,7,number_format($other_deduction,2),1,1,'R');
-            $pdf->SetFont('Arial','B',11);
-            $pdf->Cell(120,7,"Net Pay",1);
-            $pdf->Cell(60,7,number_format($net,2),1,1,'R');
-            $pdf->Ln(10);
-            $pdf->SetFont('Arial','I',10);
-            $pdf->Cell(0,7,"This is a system-generated payslip.",0,1,'C');
+        $pdf = new FPDF();
+        $pdf->AddPage();
+        if(file_exists($logo_path)) $pdf->Image($logo_path,10,10,30);
+        $pdf->SetFont('Arial','B',16);
+        $pdf->Cell(0,10,'Hotel La Vista',0,1,'C');
+        $pdf->SetFont('Arial','',12);
+        $pdf->Cell(0,7,"Payslip for $month $year",0,1,'C');
+        $pdf->Ln(10);
+        $pdf->SetFont('Arial','',11);
+        $pdf->Cell(60,7,"Employee ID: ".$staff_id,0,0);
+        $pdf->Cell(0,7,"Employee Name: ".$staff['first_name'].' '.$staff['last_name'],0,1);
+        $pdf->Cell(60,7,"Position: ".$staff['position_name'],0,0);
+        $pdf->Cell(0,7,"Department: ".$staff['department_name'],0,1);
+        $pdf->Cell(60,7,"Hire Date: ".$staff['hire_date'],0,1);
+        $pdf->Ln(5);
+        $pdf->SetFont('Arial','B',11);
+        $pdf->SetFillColor(220,220,220);
+        $pdf->Cell(120,8,"Description",1,0,'C',true);
+        $pdf->Cell(60,8,"Amount (₱)",1,1,'C',true);
+        $pdf->SetFont('Arial','',11);
+        $pdf->Cell(120,7,"Base Salary",1);
+        $pdf->Cell(60,7,number_format($base_salary,2),1,1,'R');
+        $pdf->Cell(120,7,"Worked Salary ($total_hours hrs)",1);
+        $pdf->Cell(60,7,number_format($worked_salary,2),1,1,'R');
+        $pdf->Cell(120,7,"Holiday Pay ($holiday_hours hrs)",1);
+        $pdf->Cell(60,7,number_format($holiday_pay,2),1,1,'R');
+        $pdf->Cell(120,7,"Overtime Pay ($total_ot_hours hrs)",1);
+        $pdf->Cell(60,7,number_format($ot_pay,2),1,1,'R');
+        $pdf->Cell(120,7,"Bonuses/Incentives",1);
+        $pdf->Cell(60,7,number_format($total_bonus,2),1,1,'R');
+        $pdf->Cell(120,7,"Reimbursements",1);
+        $pdf->Cell(60,7,number_format($total_reimburse,2),1,1,'R');
+        $pdf->Cell(120,7,"Gross Pay",1);
+        $pdf->Cell(60,7,number_format($gross,2),1,1,'R');
+        $pdf->Cell(120,7,"SSS Deduction",1);
+        $pdf->Cell(60,7,number_format($deductions['sss'],2),1,1,'R');
+        $pdf->Cell(120,7,"PhilHealth Deduction",1);
+        $pdf->Cell(60,7,number_format($deductions['philhealth'],2),1,1,'R');
+        $pdf->Cell(120,7,"Pag-IBIG Deduction",1);
+        $pdf->Cell(60,7,number_format($deductions['pagibig'],2),1,1,'R');
+        $pdf->Cell(120,7,"Withholding Tax",1);
+        $pdf->Cell(60,7,number_format($deductions['withholding'],2),1,1,'R');
+        $pdf->Cell(120,7,"Other Deductions",1);
+        $pdf->Cell(60,7,number_format($other_deduction,2),1,1,'R');
+        $pdf->SetFont('Arial','B',11);
+        $pdf->Cell(120,7,"Net Pay",1);
+        $pdf->Cell(60,7,number_format($net,2),1,1,'R');
+        $pdf->Ln(10);
+        $pdf->SetFont('Arial','I',10);
+        $pdf->Cell(0,7,"This is a system-generated payslip.",0,1,'C');
 
-            $filename = $staff_id."_{$month}.pdf";
-            $file_path = $save_path.$filename;
-            $pdf->Output('F',$file_path);
+        $filename = $staff_id."_{$month}.pdf";
+        $file_path = $save_path.$filename;
+        $pdf->Output('F',$file_path);
 
-            if($check->num_rows == 0 && $net > 0){
-                $stmt = $conn->prepare("INSERT INTO payslip (staff_id, month, year, amount, status, sss, philhealth, pagibig, withholding_tax, other_deduction, total_deductions, net_salary, pdf_file) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssdddddddddds",$staff_id,$month_num,$year,$gross,$deductions['sss'],$deductions['philhealth'],$deductions['pagibig'],$deductions['withholding'],$other_deduction,$total_deductions,$net,$filename);
-                $stmt->execute();
-            } else if(isset($_GET['edit']) && $_GET['edit']==$payslip_id){
-                $stmt = $conn->prepare("UPDATE payslip SET pdf_file=?, amount=?, sss=?, philhealth=?, pagibig=?, withholding_tax=?, other_deduction=?, total_deductions=?, net_salary=?, status='pending' WHERE id=?");
-                $stmt->bind_param("sdddddddddi",$filename,$gross,$deductions['sss'],$deductions['philhealth'],$deductions['pagibig'],$deductions['withholding'],$other_deduction,$total_deductions,$net,$payslip_id);
-                $stmt->execute();
-            }
-        }
+        $stmt = $conn->prepare("INSERT INTO payslip (staff_id, month, year, amount, status, sss, philhealth, pagibig, withholding_tax, other_deduction, total_deductions, net_salary, pdf_file) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE pdf_file=VALUES(pdf_file), amount=VALUES(amount), sss=VALUES(sss), philhealth=VALUES(philhealth), pagibig=VALUES(pagibig), withholding_tax=VALUES(withholding_tax), other_deduction=VALUES(other_deduction), total_deductions=VALUES(total_deductions), net_salary=VALUES(net_salary), status='pending'");
+        $stmt->bind_param("siidddddddds",$staff_id,$month_num,$year,$gross,$deductions['sss'],$deductions['philhealth'],$deductions['pagibig'],$deductions['withholding'],$other_deduction,$total_deductions,$net,$filename);
+        $stmt->execute();
+
         $check->close();
     }
 }
@@ -187,15 +180,26 @@ if ($result && $result->num_rows > 0) {
 $sql = "SELECT p.id, p.staff_id, s.first_name, s.last_name, p.pdf_file 
         FROM payslip p 
         JOIN staff s ON p.staff_id = s.staff_id 
-        WHERE month='$month_num' AND year='$year'";
+        WHERE month=? AND year=?";
+
+$params = [$month_num, $year];
+$types = "ii";
 
 if(isset($_GET['staff_id']) && $_GET['staff_id'] != '') {
-    $search = $conn->real_escape_string($_GET['staff_id']);
-    $sql .= " AND (p.staff_id LIKE '%$search%' OR s.first_name LIKE '%$search%' OR s.last_name LIKE '%$search%')";
+    $search = "%".$conn->real_escape_string($_GET['staff_id'])."%";
+    $sql .= " AND (p.staff_id LIKE ? OR s.first_name LIKE ? OR s.last_name LIKE ?)";
+    $types .= "sss";
+    $params[] = $search;
+    $params[] = $search;
+    $params[] = $search;
 }
 
 $sql .= " ORDER BY s.last_name ASC, s.first_name ASC";
-$payslips = $conn->query($sql);
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param($types, ...$params);
+$stmt->execute();
+$payslips = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -204,7 +208,7 @@ $payslips = $conn->query($sql);
 <meta charset="UTF-8">
 <title>Generate All Payslips - Hotel La Vista</title>
 <link rel="stylesheet" href="generate_all_payslips.css">
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 <div class="overlay">
