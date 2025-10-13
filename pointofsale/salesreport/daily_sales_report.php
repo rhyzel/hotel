@@ -33,14 +33,13 @@ for ($i = 29; $i >= 0; $i--) {
     $stmt->execute([$day_last_month]);
     $daily_sales_last_month[$day] = (float)($stmt->fetchColumn() ?? 0);
 }
-
 $reported_orders_stmt = $conn->prepare("
-    SELECT ro.*, ri.reported_item
-    FROM reported_order ro
-    LEFT JOIN reported_items ri ON ro.order_id = ri.order_id
-    WHERE DATE(ro.reported_at) = ?
-    ORDER BY ro.reported_at ASC
+    SELECT *
+    FROM reported_order
+    WHERE DATE(reported_at) = ?
+    ORDER BY reported_at ASC
 ");
+
 $reported_orders_stmt->execute([$selected_date]);
 $reported_orders = $reported_orders_stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -132,7 +131,7 @@ $reported_orders = $reported_orders_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <td><?= htmlspecialchars($ro['order_id']) ?></td>
                 <td><?= htmlspecialchars($ro['guest_id']) ?></td>
                 <td><?= htmlspecialchars($ro['guest_name']) ?></td>
-                <td><?= htmlspecialchars($ro['reported_item'] ?? '-') ?></td>
+                <td><?= htmlspecialchars($ro['item'] ?? '-') ?></td>
                 <td><?= htmlspecialchars($ro['complain_reason']) ?></td>
                 <td><?= htmlspecialchars($ro['resolution']) ?></td>
                 <td><?= htmlspecialchars($ro['status']) ?></td>
