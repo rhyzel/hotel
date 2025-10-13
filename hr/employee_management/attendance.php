@@ -50,11 +50,11 @@ if (isset($_POST['punch']) && isset($_POST['local_time'])) {
 
 $sql = "SELECT * FROM staff 
         WHERE position_name NOT IN ('CEO','COO') 
-        AND (first_name LIKE ? OR last_name LIKE ?) 
+        AND (staff_id LIKE ? OR first_name LIKE ? OR last_name LIKE ?) 
         ORDER BY first_name, last_name";
 $stmt = $conn->prepare($sql);
 $search_param = "%$search%";
-$stmt->bind_param("ss", $search_param, $search_param);
+$stmt->bind_param("sss", $search_param, $search_param, $search_param);
 $stmt->execute();
 $employees = $stmt->get_result();
 
