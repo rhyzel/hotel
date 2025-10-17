@@ -33,7 +33,7 @@ if ($search_item) {
 }
 $where_sql = $where ? "WHERE " . implode(" AND ", $where) : "";
 
-$stmt = $pdo->prepare("SELECT * FROM stock_usage $where_sql ORDER BY created_at DESC");
+$stmt = $pdo->prepare("SELECT su.*, i.category FROM stock_usage su LEFT JOIN inventory i ON su.item = i.item $where_sql ORDER BY su.created_at DESC");
 $stmt->execute($params);
 $usage_logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -253,7 +253,7 @@ td.actions {
                 <th>Usage ID</th>
                 <th>Order ID</th>
                 <th>Item Name</th>
-                <th>Guest Name</th>
+                  <th>Category</th>
                 <th>Quantity Used</th>
                 <th>Date Used</th>
                 <th>Actions</th>
@@ -266,7 +266,7 @@ td.actions {
                     <td data-label="Usage ID"><?= (int)$log['usage_id'] ?></td>
                     <td data-label="Order ID"><?= (int)$log['order_id'] ?></td>
                     <td data-label="Item Name"><?= htmlspecialchars($log['item']) ?></td>
-                    <td data-label="Guest Name"><?= htmlspecialchars($log['guest_name']) ?></td>
+                    <td data-label="Category"><?= htmlspecialchars($log['category'] ?? 'N/A') ?></td>
                     <td data-label="Quantity Used"><?= (int)$log['quantity_used'] ?></td>
                     <td data-label="Date Used"><?= date('M j, Y g:i A', strtotime($log['created_at'])) ?></td>
                     <td data-label="Actions" class="actions">
