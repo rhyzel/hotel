@@ -1,0 +1,205 @@
+body {
+    font-family: 'Outfit', sans-serif;
+    background: 
+        linear-gradient(rgba(40, 28, 20, 0.6), rgba(40, 28, 20, 0.6)),
+        url('../hotel_room.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #f7f3ef;
+    margin: 0;
+    padding: 0;
+    padding-top: 100px;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    background: rgb(40 28 20 / 0%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 20px 30px;
+    backdrop-filter: blur(6px);
+}
+
+.title-group {
+    max-width: 60%;
+}
+
+.title-group h1 {
+    font-size: 1.8rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #f5f2ef;
+}
+
+.title-group i {
+    color: #d2b48c;
+}
+
+.title-group p {
+    margin: 5px 0 0;
+    font-size: 0.95rem;
+    color: #ddd;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-right: 50px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background-color: #8b6f56;
+    border-radius: 6px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.back-btn:hover {
+    background-color: #b38b6d;
+    transform: scale(1.05);
+}
+
+.container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1100px; 
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: 20px;
+}
+
+.edit-request-section {
+    background-color: rgb(40 28 20 / 0%); 
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); 
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); 
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.request-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 30px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #f7f3ef;
+    font-size: 0.95rem;
+}
+
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #b38b6d;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.9); 
+    color: #3e2f28; 
+    box-sizing: border-box;
+    font-size: 1rem;
+    font-family: 'Outfit', sans-serif;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #d2b48c;
+    box-shadow: 0 0 0 3px rgba(210, 180, 140, 0.3);
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group select {
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%233e2f28%22%20d%3D%22M287%20197.91l-140.79-140.8c-2.31-2.3-5.32-3.45-8.34-3.45s-6.03%201.15-8.34%203.45L5.45%20197.91c-4.59%204.6-4.59%2012.08%200%2016.68l11.66%2011.66c4.6%204.59%2012.08%204.59%2016.68%200l113.84-113.84L258.66%20226.25c4.6%204.59%2012.08%204.59%2016.68%200l11.66-11.66c4.6-4.59%204.6-12.08%200-16.68z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 10px auto;
+}
+
+.submit-btn {
+    padding: 12px 25px;
+    background-color: #d2b48c;
+    color: #3e2f28;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.submit-btn i {
+    margin-right: 8px;
+}
+
+.submit-btn:hover {
+    background-color: #b38b6d;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.submit-btn:active {
+    transform: scale(0.99);
+}
+
+.no-requests {
+    text-align: center;
+    color: #f5f2ef;
+    font-size: 1.1rem;
+    padding: 40px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .request-form {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px 20px;
+    }
+
+    .header-controls {
+        margin-top: 15px;
+    }
+}

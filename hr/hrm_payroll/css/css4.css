@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Outfit',sans-serif;
+}
+
+body,html{
+  min-height:100%;
+  /* background image: explicit properties to ensure proper sizing and fixed attachment */
+  background-image: url('hotel_room.jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+  /* fallback background color in case image doesn't cover in some browsers */
+  background-color: #000;
+}
+
+.overlay{
+  background:rgba(0,0,0,0.6);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:60px 20px;
+}
+
+.container{
+  max-width:1200px;
+  width:100%;
+  color:#fff;
+  text-align:center;
+}
+
+header h1{
+  font-size:42px;
+  margin-bottom:8px;
+  color:#ffd700;
+}
+header p{
+  opacity:0.85;
+  margin-bottom:40px;
+}
+
+.content-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+  gap:24px;
+}
+
+.glass{
+  background:rgba(255,255,255,0.06);
+  border-radius:12px;
+  padding:25px 20px;
+  border:1px solid rgba(255,255,255,0.08);
+  box-shadow:0 8px 28px rgba(0,0,0,0.45);
+  backdrop-filter:blur(8px);
+}
+
+/* dark-mode for module highlight (used by search toggle) */
+.bonuses-content.dark-mode{
+  background: linear-gradient(180deg, rgba(20,20,20,0.95), rgba(12,12,12,0.95));
+  color:#fff;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.bonuses-content.dark-mode input,
+.bonuses-content.dark-mode select,
+.bonuses-content.dark-mode textarea{
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.bonuses-content.dark-mode select option{
+  /* native dropdown option styling is limited, but set readable colors where supported */
+  color: #111;
+  background: #fff;
+}
+.bonuses-content.dark-mode select:focus option{
+  color: #111;
+  background: #fff;
+}
+.bonuses-content.dark-mode .calculate-btn { background:#ffd700; color:#111; }
+.bonuses-content.dark-mode .save-btn { background:#1e8f3e; color:#fff; }
+
+/* custom select widget styles */
+.custom-select{ position:relative; display:inline-block; width:100%; margin-top:6px; }
+.custom-select .custom-select-trigger{ width:100%; text-align:left; padding:8px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.04); color:inherit; cursor:pointer; }
+.custom-select .custom-options{ position:absolute; left:0; right:0; top:calc(100% + 6px); background:#fff; color:#111; border-radius:6px; box-shadow:0 8px 20px rgba(0,0,0,0.12); max-height:260px; overflow:auto; z-index:40; display:none; }
+.custom-select.open .custom-options{ display:block; }
+.custom-option{ padding:8px 10px; cursor:pointer; }
+.custom-option:hover, .custom-option:focus{ background:#f3f3f3; }
+
+/* dark-mode overrides: show white option background and dark text for readability */
+.bonuses-content.dark-mode .custom-select .custom-select-trigger{ background: rgba(255,255,255,0.04); color:#fff; border:1px solid rgba(255,255,255,0.06); }
+.bonuses-content.dark-mode .custom-select .custom-options{ background:#fff; color:#111; }
+.bonuses-content.dark-mode .custom-option{ color:#111; }
+
+h2 {
+  color:#ffd700;
+  font-size:20px;
+  margin-bottom:18px;
+}
+
+.form-group {
+  margin-bottom:14px;
+  text-align:left;
+}
+
+.form-group label {
+  display:block;
+  font-size:14px; 
+  margin-bottom:4px;
+  opacity:0.9;
+}
+
+.form-group input {
+  width:100%;
+  padding:8px 10px;
+  border-radius:6px;
+  border:none;background:rgba(255,255,255,0.15);
+  color:#fff;
+}
+
+.form-group select {
+  width:100%;
+  padding:8px 10px;
+  border-radius:6px;
+  border:none;
+  background:rgba(255,255,255,0.12);
+  color:#fff;
+}
+
+.summary-row {
+  display:flex;
+  justify-content:space-between;
+  font-size:16px;
+  margin:10px 0;
+}
+
+.actions {
+  margin-top:20px;
+  display:flex;
+  gap:10px;
+  justify-content:center;
+}
+
+button {
+  padding:10px 18px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.3s;
+}
+
+.calculate-btn {
+  background:#ffca08;
+  color:#222;
+}
+
+.save-btn {
+  background:#00ff9d;
+  color:#111;
+}
+
+.back-btn {
+  margin-top:30px;
+  padding:12px 24px;
+  background:#ffca08;
+  color:#222;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  box-shadow:0 6px 18px rgba(0,0,0,0.35);
+  cursor:pointer; 
+}
+
+.form-group textarea {
+  width: 100%;              /* makes it fill the container */
+  height: 80px;             /* adjust height — increase/decrease as needed */
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 14px;
+  resize: vertical;         /* lets you resize up/down only (optional) */
+}
+
+.form-group textarea::placeholder {
+  color: rgba(255,255,255,0.6);
+}
+
+/* inline message used by payroll modules */
+.inline-message{
+  margin-top:12px;
+  padding:10px 14px;
+  border-radius:8px;
+  display:inline-block;
+  font-weight:700;
+}
+.inline-message.success{ background:#1e8f3e; color:#fff; }
+.inline-message.error{ background:#c92a2a; color:#fff; }
+
+/* generic message box used by JS showMessage helpers */
+.message{ display:inline-block; padding:10px 14px; border-radius:8px; font-weight:700; margin-top:12px; }
+.message--success{ background:#1e8f3e; color:#ffffff; box-shadow:0 8px 20px rgba(30,143,62,0.12); }
+.message--error{ background:#c92a2a; color:#ffffff; box-shadow:0 8px 20px rgba(201,42,42,0.12); }
+.message.show{ opacity:1; transform:translateY(0); transition:opacity .18s ease, transform .18s ease; }
+.message[hidden]{ display:none; }
+
+/* search toggle button styling for bonuses module */
+.search-toggle{ border-radius:8px; padding:8px 10px; cursor:pointer; }
+.search-toggle:focus{ outline:3px solid rgba(255,202,8,0.25); }

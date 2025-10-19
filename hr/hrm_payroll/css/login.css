@@ -1,0 +1,27 @@
+body, html {
+  height: 100%;
+  font-family: 'Outfit', sans-serif;
+  margin: 0;
+  background: url('../../homepage/hotel_room.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
+.login-overlay {
+  background: rgba(0,0,0,0.6);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-card {
+  background: rgba(255,255,255,0.06);
+  padding: 28px;
+  border-radius: 12px;
+  width: 320px;
+  color: #fff;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+}
+.login-card h2 { margin-bottom: 14px; }
+.login-card label { display:block; font-size:0.9rem; margin-top:10px; opacity:0.9; }
+.login-card input { width:100%; padding:10px; margin-top:6px; border-radius:6px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:#fff; }
+.login-card button { margin-top:14px; width:100%; padding:10px; border-radius:6px; border:none; background:#2e8b57; color:#fff; cursor:pointer; font-weight:600; }
+.error { background:#b00020; padding:8px; border-radius:6px; margin-bottom:10px; }

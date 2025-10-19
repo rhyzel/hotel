@@ -19,6 +19,7 @@ $receipt_items = [];
 foreach($order as $id => $item){
     $qty = intval($item['qty']);
     $price = floatval($item['price']);
+    $category = $item['category'] ?? 'Lounge Bar';
     if($qty <= 0 || $price <= 0) continue;
 
     $subtotal = $price * $qty;
@@ -29,7 +30,8 @@ foreach($order as $id => $item){
         'name' => $item['name'],
         'qty' => $qty,
         'price' => $price,
-        'subtotal' => $subtotal
+        'subtotal' => $subtotal,
+        'category' => $category
     ];
 
     $stmt_inv = $conn->prepare("UPDATE inventory SET quantity_in_stock = quantity_in_stock - ? WHERE item_id = ?");
@@ -37,10 +39,10 @@ foreach($order as $id => $item){
 
     $stmt_stock_usage = $conn->prepare("
         INSERT INTO stock_usage
-        (order_id, item, guest_id, guest_name, quantity_used, used_by, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, NOW())
+        (order_id, item, category, guest_id, guest_name, quantity_used, used_by, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
     ");
-    $stmt_stock_usage->execute([$order_id, $item['name'], $guest_id, $guest_name, $qty, $guest_name]);
+    $stmt_stock_usage->execute([$order_id, $item['name'], $category, $guest_id, $guest_name, $qty, $guest_name]);
 }
 
 $paid_amount = 0;
@@ -109,12 +111,13 @@ $receipt_date = date('F j, Y, g:i A');
 
 <table>
 <thead>
-<tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr>
+<tr><th>Item</th><th>Category</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr>
 </thead>
 <tbody>
 <?php foreach($receipt_items as $item): ?>
 <tr>
 <td><?= htmlspecialchars($item['name']) ?></td>
+<td><?= htmlspecialchars($item['category']) ?></td>
 <td><?= $item['qty'] ?></td>
 <td>₱<?= number_format($item['price'],2) ?></td>
 <td>₱<?= number_format($item['subtotal'],2) ?></td>
@@ -122,12 +125,12 @@ $receipt_date = date('F j, Y, g:i A');
 <?php endforeach; ?>
 </tbody>
 <tfoot>
-<tr><td colspan="3">Total</td><td>₱<?= number_format($total,2) ?></td></tr>
+<tr><td colspan="4">Total</td><td>₱<?= number_format($total,2) ?></td></tr>
 <?php if($current_payment_option === 'Paid' || $current_payment_option === 'Partial Payment'): ?>
-<tr><td colspan="3">Paid</td><td>₱<?= number_format($paid_amount,2) ?></td></tr>
-<tr><td colspan="3">Remaining</td><td>₱<?= number_format($remaining_amount,2) ?></td></tr>
+<tr><td colspan="4">Paid</td><td>₱<?= number_format($paid_amount,2) ?></td></tr>
+<tr><td colspan="4">Remaining</td><td>₱<?= number_format($remaining_amount,2) ?></td></tr>
 <?php else: ?>
-<tr><td colspan="3">Remaining</td><td>₱<?= number_format($remaining_amount,2) ?></td></tr>
+<tr><td colspan="4">Remaining</td><td>₱<?= number_format($remaining_amount,2) ?></td></tr>
 <?php endif; ?>
 </tfoot>
 </table>

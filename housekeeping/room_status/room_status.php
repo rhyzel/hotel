@@ -1,165 +1,147 @@
 <?php
-
 include __DIR__ . '/../db.php';
 
+$status_filter = $_GET['status'] ?? 'all';
 
+if ($status_filter === 'all') {
+    $result = $conn->prepare("SELECT * FROM rooms ORDER BY room_number ASC");
+} else {
+    $result = $conn->prepare("SELECT * FROM rooms WHERE status=? ORDER BY room_number ASC");
+    $result->bind_param("s", $status_filter);
+}
+$result->execute();
+$rooms = $result->get_result();
 
-// Fetch all rooms with Dirty, Cleaning, and Under Maintenance statuses
-$sql = "SELECT room_id, room_number, room_type, max_occupancy, price_rate, status
-        FROM rooms 
-        WHERE status IN ('dirty', 'cleaning', 'under maintenance')";
-$result = $conn->query($sql);
-
-// Count rooms by status for pie chart
-$countQuery = "SELECT status, COUNT(*) as total
-               FROM rooms
-               WHERE status IN ('dirty', 'cleaning', 'under maintenance')
-               GROUP BY status";
-$countResult = $conn->query($countQuery);
+$statusColors = [
+    'available' => '#f5f0e1',
+    'occupied' => '#5d3a1a',
+    'reserved' => '#d8b59e',
+    'under maintenance' => '#8b4513',
+    'dirty' => '#cfa16f'
+];
 
 $statuses = [];
 $totals = [];
-$colors = [];
+$countResult = $conn->query("SELECT status, COUNT(*) as total FROM rooms GROUP BY status");
+while ($row = $countResult->fetch_assoc()) {
+    $statuses[] = ucfirst($row['status']);
+    $totals[] = $row['total'];
+}
 
-$statusColors = [
-    'dirty' => '#ffc107',            // yellow
-    'cleaning' => '#ff69b4',         // pink
-    'under maintenance' => '#007bff' // blue
-];
-
-if ($countResult && $countResult->num_rows > 0) {
-    while ($row = $countResult->fetch_assoc()) {
-        $statuses[] = ucfirst($row['status']);
-        $totals[] = $row['total'];
-        $colors[] = $statusColors[$row['status']];
-    }
+$roomsByFloor = [];
+while ($row = $rooms->fetch_assoc()) {
+    $floor = intval(substr($row['room_number'], 0, 1));
+    $roomsByFloor[$floor][] = $row;
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Room Status Dashboard | Housekeeping</title>
-  <link rel="stylesheet" href="room_status.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    /* Dark legend container under the chart */
-    .legend-container {
-      margin-top: 20px;
-      background: rgba(30, 30, 30, 0.9);
-      padding: 15px 20px;
-      border-radius: 12px;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #fff;
-      font-weight: 600;
-    }
-    .legend-color {
-      width: 20px;
-      height: 20px;
-      border-radius: 4px;
-      display: inline-block;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Room Status | Housekeeping</title>
+<link rel="stylesheet" href="room_status.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="overlay">
-    <div class="container">
-      <header style="position: relative;">
-        <h1><i class="fas fa-bed"></i> Room Status Dashboard</h1>
-        <p>Showing rooms that are <strong>Dirty</strong>, <strong>Cleaning</strong>, or <strong>Under Maintenance</strong>.</p>
-        <a href="../housekeeping.php" class="back-btn" style="position: absolute; top: 0; right: 0;"><i class="fas fa-arrow-left"></i> Back</a>
-      </header>
-
-      <div class="status-container">
-        <!-- Chart -->
-        <div class="chart-section">
-          <canvas id="roomChart"></canvas>
-          <p class="chart-label">Room Distribution by Status</p>
-
-          <!-- Custom Legend -->
-          <div class="legend-container">
-            <?php foreach ($statuses as $index => $status): ?>
-              <div class="legend-item">
-                <span class="legend-color" style="background-color: <?php echo $colors[$index]; ?>;"></span>
-                <span><?php echo $status; ?></span>
-              </div>
-            <?php endforeach; ?>
-          </div>
-        </div>
-
-        <!-- Table -->
-        <div class="table-section">
-          <?php if ($result && $result->num_rows > 0): ?>
-            <table class="status-table">
-              <thead>
-                <tr>
-                  <th>Room Number</th>
-                  <th>Room Type</th>
-                  <th>Max Occupancy</th>
-                  <th>Price Rate</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php while ($row = $result->fetch_assoc()): ?>
-                  <tr>
-                    <td><?php echo htmlspecialchars($row['room_number']); ?></td>
-                    <td><?php echo htmlspecialchars($row['room_type']); ?></td>
-                    <td><?php echo htmlspecialchars($row['max_occupancy']); ?></td>
-                    <td>₱<?php echo number_format($row['price_rate'], 2); ?></td>
-                    <td>
-                      <span class="status-badge" 
-                            style="background-color: <?php echo $statusColors[$row['status']]; ?>;">
-                        <?php echo ucfirst($row['status']); ?>
-                      </span>
-                    </td>
-                  </tr>
-                <?php endwhile; ?>
-              </tbody>
-            </table>
-          <?php else: ?>
-            <p class="no-data">✅ No rooms found for the selected statuses.</p>
-          <?php endif; ?>
-        </div>
-      </div>
-
-      <a href="../housekeeping.php" class="back-btn">
-        <i class="fas fa-arrow-left"></i> Back 
-      </a>
+<div class="container">
+    <h1><i class="fas fa-bed"></i> Room Status</h1>
+    <p>View and manage the status of hotel rooms.</p>
+    <div class="filter-row">
+        <a href="http://localhost/hotel/housekeeping/housekeeping.php" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+        <form method="GET" class="filter-form">
+            <select name="status" onchange="this.form.submit()">
+                <option value="all" <?= ($status_filter == 'all') ? 'selected' : '' ?>>All</option>
+                <?php foreach (array_keys($statusColors) as $status): ?>
+                    <option value="<?= $status ?>" <?= ($status_filter == $status) ? 'selected' : '' ?>><?= ucfirst($status) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </form>
     </div>
-  </div>
 
-  <script>
-    const ctx = document.getElementById('roomChart').getContext('2d');
-    const roomChart = new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: <?php echo json_encode($statuses); ?>,
+    <?php foreach ($roomsByFloor as $floor => $floorRooms): ?>
+    <div class="floor-section">
+        <div class="floor-title">Floor <?= $floor ?></div>
+        <div class="room-grid">
+            <?php foreach ($floorRooms as $room): ?>
+            <div class="room-card">
+                <div class="room-number"><?= htmlspecialchars($room['room_number']) ?></div>
+                <div class="room-type"><?= htmlspecialchars($room['room_type']) ?></div>
+                <div class="room-status" style="background-color: <?= $statusColors[$room['status']] ?>"><?= ucfirst($room['status']) ?></div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endforeach; ?>
+</div>
+
+<div id="statusModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <canvas id="roomChart"></canvas>
+        <div class="legend-container">
+            <?php foreach ($statuses as $i => $s): ?>
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: <?= $statusColors[strtolower($s)] ?>"></span>
+                <span><?= $s ?></span>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+
+<script>
+const modal = document.getElementById("statusModal");
+const span = document.getElementsByClassName("close")[0];
+modal.style.display = "flex";
+
+span.onclick = function() { modal.style.display = "none"; }
+window.onclick = function(e) { if (e.target == modal) modal.style.display = "none"; }
+
+const ctx = document.getElementById('roomChart').getContext('2d');
+const roomChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: <?= json_encode($statuses) ?>,
         datasets: [{
-          data: <?php echo json_encode($totals); ?>,
-          backgroundColor: <?php echo json_encode($colors); ?>,
-          borderColor: '#fff',
-          borderWidth: 2
+            data: <?= json_encode($totals) ?>,
+            backgroundColor: <?= json_encode(array_map(fn($s) => $statusColors[strtolower($s)], $statuses)) ?>,
+            borderColor: '#fff',
+            borderWidth: 2
         }]
-      },
-      options: {
-        plugins: {
-          legend: {
-            display: false // disable default legend
-          }
-        }
-      }
+    },
+    options: { plugins: { legend: { display: false } } }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const floorSections = document.querySelectorAll('.floor-section');
+  const modal = document.getElementById('statusModal');
+  const closeBtn = document.querySelector('.close');
+  const chartBtn = document.createElement('button');
+  chartBtn.textContent = 'Show Overview';
+  chartBtn.classList.add('chart-btn');
+  document.querySelector('.container').insertBefore(chartBtn, document.querySelector('.filter-row').nextSibling);
+
+  floorSections.forEach(section => {
+    const title = section.querySelector('.floor-title');
+    title.addEventListener('click', () => {
+      section.classList.toggle('active');
     });
-  </script>
+  });
+
+  chartBtn.addEventListener('click', () => {
+    modal.style.display = 'flex';
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  window.addEventListener('click', e => {
+    if (e.target === modal) modal.style.display = 'none';
+  });
+});
+</script>
 </body>
 </html>
 <?php $conn->close(); ?>

@@ -28,11 +28,11 @@ if (!isset($_SESSION['staff_id'])) {
           <i class="fas fa-clipboard-list"></i>
           <span>HR Recruitment</span>
         </a>
-         <a href="http://localhost/hotel/hr/employee_management/hr_employee_management.php" class="module">
+         <a href="employee_management/hr_employee_management.php" class="module">
           <i class="fas fa-users-cog"></i>
           <span>Employee Management</span>
         </a>
-        <a href="http://localhost/hotel/hr/payroll/payroll.php" class="module">
+        <a href="../hr/hrm_payroll/login.php" class="module">
           <i class="fas fa-money-bill-wave"></i>
           <span>Payroll</span>
         </a>
@@ -47,3 +47,5 @@ if (!isset($_SESSION['staff_id'])) {
   </div>
 </body>
 </html>
+
+

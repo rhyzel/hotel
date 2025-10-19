@@ -1,0 +1,55 @@
+<?php
+require_once('../db.php');
+
+function recordGuestBilling($guestId, $orderId, $items, $totalAmount, $paymentOption, $paymentMethod, $partialPayment) {
+    global $conn;
+    
+    $itemNames = array_map(function($item) {
+        return $item['name'] . ' (x' . $item['qty'] . ')';
+    }, $items);
+    
+    $itemList = implode(', ', $itemNames);
+    $remainingAmount = $totalAmount - $partialPayment;
+    
+    try {
+        $stmt = $conn->prepare("
+            INSERT INTO guest_billing (
+                guest_id, 
+                order_id,
+                order_type,
+                item_name,
+                total_amount,
+                payment_option,
+                payment_method,
+                partial_payment,
+                remaining_amount
+            ) VALUES (
+                :guest_id,
+                :order_id,
+                'Gift Store',
+                :item_name,
+                :total_amount,
+                :payment_option,
+                :payment_method,
+                :partial_payment,
+                :remaining_amount
+            )
+        ");
+        
+        $stmt->execute([
+            ':guest_id' => $guestId,
+            ':order_id' => $orderId,
+            ':item_name' => $itemList,
+            ':total_amount' => $totalAmount,
+            ':payment_option' => $paymentOption,
+            ':payment_method' => $paymentMethod,
+            ':partial_payment' => $partialPayment,
+            ':remaining_amount' => $remainingAmount
+        ]);
+        
+        return true;
+    } catch (PDOException $e) {
+        error_log("Error recording guest billing: " . $e->getMessage());
+        return false;
+    }
+}

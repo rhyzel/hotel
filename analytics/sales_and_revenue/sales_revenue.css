@@ -1,0 +1,141 @@
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+}
+
+body, html { 
+  height: 100%; 
+  font-family: 'Outfit', sans-serif; 
+  background: url('../../homepage/hotel_room.jpg') no-repeat center center fixed; 
+  background-size: cover; 
+}
+
+.overlay { 
+  background: rgba(0, 0, 0, 0.7); 
+  min-height: 100vh; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  padding: 40px 20px; 
+}
+
+header { 
+  text-align: center; 
+  color: #fff; 
+  margin-bottom: 30px; 
+}
+header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
+header p { font-size: 1rem; opacity: 0.85; }
+
+.card { 
+  background: rgba(0, 0, 0, 0.85); 
+  border-radius: 15px; 
+  padding: 20px; 
+  color: white; 
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5); 
+  margin-bottom: 25px; 
+  width: 100%; 
+  max-width: 1600px; 
+}
+
+.tabs { display: flex; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+.tab-btn { 
+  padding: 10px 20px; border: none; background: rgba(255,255,255,0.1); color: white; border-radius: 8px; 
+  cursor: pointer; font-weight: 600; transition: all 0.2s ease-in-out; 
+}
+.tab-btn.active { background: #e69419; color: #000; }
+.tab-btn:hover { background: rgba(255,255,255,0.25); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.chart-container { position: relative; margin: 0 auto; padding: 20px; width: 95vw; height: 70vh; }
+
+table { width: 100%; border-collapse: collapse; color: white; font-size: 0.9rem; }
+th, td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+th { background-color: rgba(255,255,255,0.1); text-align: left; }
+tbody tr:hover { background-color: rgba(255,255,255,0.05); }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #666; }
+
+#backToTop { margin: 20px auto 0 auto; display: block; padding: 10px 18px; background: #17a2b8; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600; transition: background 0.2s ease-in-out; }
+#backToTop:hover { background: #138496; }
+
+a.back-link { position: fixed; top: 20px; right: 20px; padding: 8px 15px; background: #e69419ff; color: #000; text-decoration: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 6px; z-index: 10; }
+
+/* Inputs and Dropdowns - Dark Theme */
+input[type="text"], select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input[type="text"]::placeholder { color: rgba(255,255,255,0.7); }
+
+input[type="text"]:focus,
+select:focus { border-color: #e69419; background: rgba(255,255,255,0.15); color: #fff; }
+
+/* Dropdown arrow */
+select {
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0L5 6L10 0H0Z' fill='white'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px 6px;
+  cursor: pointer;
+}
+
+/* Dropdown options dark */
+select option {
+  background-color: rgba(0,0,0,0.85);
+  color: #fff;
+}
+
+/* Dropdown hover option */
+select option:hover {
+  background-color: rgba(230,148,25,0.8);
+  color: #000;
+}
+/* Dark themed select dropdowns */
+.filters select {
+    padding: 8px 35px 8px 10px; /* Add space on the right for the arrow */
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    position: relative;
+}
+
+/* Add arrow using pseudo-element */
+.filters select::-ms-expand {
+    display: none; /* Remove default arrow in IE */
+}
+
+.filters select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='white' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px 6px;
+}
+
+/* Hover/focus styling */
+.filters select:focus {
+    outline: none;
+    border-color: #e69419;
+}

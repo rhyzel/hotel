@@ -1,125 +1,169 @@
 <?php
-include '../../db_connect.php';
+include __DIR__ . '/../db.php';
 
-session_start();
-
-// Set timezone to Philippines
-date_default_timezone_set('Asia/Manila');
-
-// Handle date filter
-$start_date = $_POST['start_date'] ?? date('Y-m-d');
-$end_date = $_POST['end_date'] ?? date('Y-m-d');
-
-$date_filter = " AND DATE(ht.assigned_at) BETWEEN ? AND ?";
-$date_params = [$start_date, $end_date];
-
-// Housekeeping positions
-$housekeeping_positions = [
-    'Linen Room Attendant',
-    'Laundry Supervisor',
-    'Public Area Attendant',
-    'Assistant Housekeeper',
-    'Room Attendant'
-];
-$placeholders = "'" . implode("','", $housekeeping_positions) . "'";
-
-// Fetch housekeeping staff
-$staff_sql = "SELECT staff_id, first_name, last_name, position_name FROM staff WHERE position_name IN ($placeholders) ORDER BY first_name, last_name";
-$staff_result = $conn->query($staff_sql);
-
-// Function to calculate performance metrics
-function getStaffPerformance($conn, $staff_id, $date_filter, $date_params) {
-    // Total tasks assigned
-    $assigned_sql = "SELECT COUNT(*) as total FROM housekeeping_tasks ht WHERE staff_id = ?" . $date_filter;
-    $assigned_stmt = $conn->prepare($assigned_sql);
-    $assigned_stmt->bind_param("s" . str_repeat("s", count($date_params)), $staff_id, ...$date_params);
-    $assigned_stmt->execute();
-    $assigned_result = $assigned_stmt->get_result();
-    $assigned = $assigned_result->fetch_assoc()['total'];
-    $assigned_stmt->close();
-
-    // Total tasks completed
-    $completed_sql = "SELECT COUNT(*) as total FROM housekeeping_tasks ht WHERE staff_id = ? AND task_status = 'completed'" . $date_filter;
-    $completed_stmt = $conn->prepare($completed_sql);
-    $completed_stmt->bind_param("s" . str_repeat("s", count($date_params)), $staff_id, ...$date_params);
-    $completed_stmt->execute();
-    $completed_result = $completed_stmt->get_result();
-    $completed = $completed_result->fetch_assoc()['total'];
-    $completed_stmt->close();
-
-    // Total tasks in progress
-    $in_progress_sql = "SELECT COUNT(*) as total FROM housekeeping_tasks ht WHERE staff_id = ? AND task_status = 'in progress'" . $date_filter;
-    $in_progress_stmt = $conn->prepare($in_progress_sql);
-    $in_progress_stmt->bind_param("s" . str_repeat("s", count($date_params)), $staff_id, ...$date_params);
-    $in_progress_stmt->execute();
-    $in_progress_result = $in_progress_stmt->get_result();
-    $in_progress = $in_progress_result->fetch_assoc()['total'];
-    $in_progress_stmt->close();
-
-    // Total task hours (sum of completion times in hours for tasks completed on the selected dates)
-    $time_date_filter = str_replace('ht.assigned_at', 'ht.end_time', $date_filter);
-    $total_hours_sql = "SELECT SUM(TIMESTAMPDIFF(MINUTE, start_time, end_time) / 60.0) as total_hours FROM housekeeping_tasks ht WHERE staff_id = ? AND task_status = 'completed' AND start_time IS NOT NULL AND end_time IS NOT NULL" . $time_date_filter;
-    $total_hours_stmt = $conn->prepare($total_hours_sql);
-    $total_hours_stmt->bind_param("s" . str_repeat("s", count($date_params)), $staff_id, ...$date_params);
-    $total_hours_stmt->execute();
-    $total_hours_result = $total_hours_stmt->get_result();
-    $total_hours = $total_hours_result->fetch_assoc()['total_hours'];
-    $total_hours_decimal = $total_hours ? $total_hours : 0;
-    $hours = floor($total_hours_decimal);
-    $minutes = floor(($total_hours_decimal - $hours) * 60);
-    $seconds = round((($total_hours_decimal - $hours) * 60 - $minutes) * 60);
-    $total_hours_formatted = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-    $total_hours_stmt->close();
-
-    // Maintenance requests submitted
-    $maintenance_filter = '';
-    if (!empty($date_params)) {
-        $maintenance_filter = " AND DATE(requested_at) BETWEEN ? AND ?";
-    }
-    $maintenance_sql = "SELECT COUNT(*) as total FROM maintenance_requests WHERE requester_staff_id = ?" . $maintenance_filter;
-    $maintenance_stmt = $conn->prepare($maintenance_sql);
-    if (!empty($date_params)) {
-        $maintenance_stmt->bind_param("s" . str_repeat("s", count($date_params)), $staff_id, ...$date_params);
+if (isset($_POST['delete_performance']) && isset($_POST['performance_id'])) {
+    $performanceId = $_POST['performance_id'];
+    $stmt = $conn->prepare("DELETE FROM staff_performance WHERE id = ?");
+    $stmt->bind_param("i", $performanceId);
+    if ($stmt->execute()) {
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
     } else {
-        $maintenance_stmt->bind_param("s", $staff_id);
+        echo "<script>alert('Error deleting record: " . $conn->error . "');</script>";
     }
-    $maintenance_stmt->execute();
-    $maintenance_result = $maintenance_stmt->get_result();
-    $maintenance = $maintenance_result->fetch_assoc()['total'];
-    $maintenance_stmt->close();
-
-    // Total items used
-    $items_sql = "SELECT SUM(hti.quantity_needed) as total FROM hp_tasks_items hti JOIN housekeeping_tasks ht ON hti.task_id = ht.task_id WHERE ht.staff_id = ?" . $date_filter;
-    $items_stmt = $conn->prepare($items_sql);
-    $items_stmt->bind_param("s" . str_repeat("s", count($date_params)), $staff_id, ...$date_params);
-    $items_stmt->execute();
-    $items_result = $items_stmt->get_result();
-    $items_used = $items_result->fetch_assoc()['total'] ?? 0;
-    $items_stmt->close();
-
-    return [
-        'assigned' => $assigned,
-        'completed' => $completed,
-        'in_progress' => $in_progress,
-        'total_hours_formatted' => $total_hours_formatted,
-        'maintenance' => $maintenance,
-        'items_used' => $items_used
-    ];
+    $stmt->close();
 }
 
-// Prepare data for chart
-$staff_data = [];
-$staff_names = [];
-$completed_counts = [];
+if (isset($_POST['add_performance'])) {
+    $staffId = $_POST['staff_id'];
+    $score = $_POST['score'];
+    $selectedRemark = $_POST['remark_select'];
+    $notes = trim($_POST['notes']);
 
-if ($staff_result && $staff_result->num_rows > 0) {
-    while ($staff = $staff_result->fetch_assoc()) {
-        $performance = getStaffPerformance($conn, $staff['staff_id'], $date_filter, $date_params);
-        $staff['performance'] = $performance;
-        $staff_data[] = $staff;
-        $staff_names[] = $staff['first_name'] . ' ' . $staff['last_name'];
-        $completed_counts[] = $performance['completed'];
+    // Combine selected remark and notes into the single remarks column
+    $remarks = $selectedRemark;
+    if (!empty($notes)) {
+        // If a remark was selected, add a separator; otherwise, just use the notes as the main remark
+        $remarks .= !empty($selectedRemark) ? " - " . $notes : $notes;
     }
+    
+    // Ensure remarks is not empty if score is provided (though the database constraint might allow it)
+    if (empty($remarks)) {
+        $remarks = "No specific remarks provided.";
+    }
+    
+    $stmt = $conn->prepare("INSERT INTO staff_performance (staff_id, score, remarks) VALUES (?, ?, ?)");
+    $stmt->bind_param("sis", $staffId, $score, $remarks);
+    if ($stmt->execute()) {
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
+    } else {
+        echo "<script>alert('Error adding record: " . $conn->error . "');</script>";
+    }
+    $stmt->close();
+}
+
+$sql = "
+    SELECT 
+        sp.id AS performance_id,
+        sp.staff_id,
+        CONCAT(s.first_name, ' ', s.last_name) AS full_name,
+        sp.score,
+        sp.remarks,
+        sp.created_at
+    FROM 
+        staff_performance sp
+    JOIN 
+        staff s ON sp.staff_id = s.staff_id
+    WHERE
+        s.department_name = 'Housekeeping'
+    ORDER BY
+        sp.created_at DESC
+";
+$result = $conn->query($sql);
+$staffPerformance = $result->fetch_all(MYSQLI_ASSOC);
+
+$staffListSql = "SELECT staff_id, CONCAT(first_name, ' ', last_name) AS full_name FROM staff WHERE employment_status = 'Active' AND department_name = 'Housekeeping' ORDER BY full_name ASC";
+$staffListResult = $conn->query($staffListSql);
+$staffList = $staffListResult->fetch_all(MYSQLI_ASSOC);
+
+$scoreColors = [
+    'Outstanding' => '#4CAF50',
+    'Very Good' => '#d2b48c',
+    'Good' => '#3498db',
+    'Satisfactory' => '#e67e22',
+    'Needs Improvement' => '#e74c3c'
+];
+
+// Predefined Remarks for the dropdown
+$predefinedRemarks = [
+    'Best Performance',
+    'Great Job',
+    'Good Effort',
+    'Satisfactory Work',
+    'Needs Improvement on Cleanliness',
+    'Punctuality Issue'
+];
+
+function getScoreColor($score, $scoreColors) {
+    if ($score >= 90) return $scoreColors['Outstanding'];
+    if ($score >= 85) return $scoreColors['Very Good'];
+    if ($score >= 80) return $scoreColors['Good'];
+    if ($score >= 75) return $scoreColors['Satisfactory'];
+    return $scoreColors['Needs Improvement'];
+}
+
+function getScoreCategory($score) {
+    if ($score >= 90) return 'Outstanding';
+    if ($score >= 85) return 'Very Good';
+    if ($score >= 80) return 'Good';
+    if ($score >= 75) return 'Satisfactory';
+    return 'Needs Improvement';
+}
+
+$performanceByStaff = [];
+foreach ($staffPerformance as $record) {
+    $staffID = $record['staff_id'];
+    if (!isset($performanceByStaff[$staffID])) {
+        $performanceByStaff[$staffID] = [
+            'full_name' => $record['full_name'],
+            'records' => []
+        ];
+    }
+    $performanceByStaff[$staffID]['records'][] = $record;
+}
+
+$lineChartData = [];
+$monthLabels = [];
+$now = new DateTime();
+
+for ($i = 5; $i >= 0; $i--) {
+    $month = (clone $now)->modify("-$i months");
+    $label = $month->format('M Y');
+    $monthLabels[] = $label;
+    $lineChartData[$label] = array_fill_keys(array_keys($scoreColors), 0);
+}
+
+$trendSql = "
+    SELECT 
+        score, 
+        DATE_FORMAT(created_at, '%b %Y') as month_year
+    FROM 
+        staff_performance sp
+    JOIN
+        staff s ON sp.staff_id = s.staff_id
+    WHERE
+        s.department_name = 'Housekeeping' AND created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+    ORDER BY
+        created_at ASC
+";
+$trendResult = $conn->query($trendSql);
+$trendData = $trendResult->fetch_all(MYSQLI_ASSOC);
+
+foreach ($trendData as $row) {
+    $category = getScoreCategory($row['score']);
+    $month = $row['month_year'];
+    if (isset($lineChartData[$month])) {
+        $lineChartData[$month][$category]++;
+    }
+}
+
+$chartDatasets = [];
+foreach ($scoreColors as $category => $color) {
+    $dataPoints = [];
+    foreach ($monthLabels as $month) {
+        $dataPoints[] = $lineChartData[$month][$category] ?? 0;
+    }
+    $chartDatasets[] = [
+        'label' => $category,
+        'data' => $dataPoints,
+        'borderColor' => $color,
+        'backgroundColor' => 'transparent',
+        'tension' => 0.3,
+        'borderWidth' => 3,
+        'pointRadius' => 4,
+        'pointHoverRadius' => 6,
+    ];
 }
 
 ?>
@@ -127,125 +171,235 @@ if ($staff_result && $staff_result->num_rows > 0) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Staff Performance Tracking | Housekeeping</title>
-    <link rel="stylesheet" href="/hotel/homepage/index.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        .performance-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            color: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        .performance-table th, .performance-table td {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .performance-table th {
-            background: rgba(255, 255, 255, 0.1);
-            font-weight: 600;
-            color: #ffd700;
-        }
-        .performance-table tr:hover td {
-            background: rgba(255, 255, 255, 0.05);
-            transition: background 0.3s ease;
-        }
-        .chart-container {
-            margin: 30px 0;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-        }
-        .back-btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 18px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.15);
-            color: #fff;
-            text-decoration: none;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        .back-btn:hover {
-            background: rgba(255,255,255,0.25);
-        }
-        .high-performance { color: #28a745; font-weight: 600; }
-        .medium-performance { color: #ffc107; font-weight: 600; }
-        .low-performance { color: #dc3545; font-weight: 600; }
-    </style>
+<meta charset="UTF-8">
+<title>Housekeeping Performance Tracking</title>
+<link rel="stylesheet" href="hp_performance.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+.modal.show { display: flex !important; }
+#chartModal .modal-content-grid {
+    display: block;
+}
+.stats-in-modal { 
+    display: none;
+}
+#chartModal .modal-content.glass {
+    max-width: 900px;
+    width: 90%;
+}
+</style>
 </head>
 <body>
-    <div class="overlay">
-        <div class="container">
-            <header style="position: relative;">
-                <h1><i class="fas fa-chart-line"></i> Staff Performance Tracking</h1>
-                <p>Monitor and analyze housekeeping staff performance metrics.</p>
-                <a href="../housekeeping.php" class="back-btn" style="position: absolute; top: 0; right: 0;"><i class="fas fa-arrow-left"></i> Back</a>
-            </header>
+<div class="overlay">
+    <div class="container">
+        
+        <h1 style="text-align: center; margin: 0 0 30px 0; font-size: 2.5rem; color: var(--color-light-accent);">Housekeeping Performance Tracking</h1>
 
-            <!-- Date Filter Form -->
-            <form method="POST" style="margin: 20px 0; text-align: center;">
-                <label for="start_date" style="color: #fff; margin-right: 10px;">Start Date:</label>
-                <input type="date" name="start_date" id="start_date" value="<?php echo htmlspecialchars($start_date); ?>" style="padding: 8px; border-radius: 4px; border: 1px solid #444; background: #2c2c2c; color: #fff;">
-                <label for="end_date" style="color: #fff; margin: 0 10px;">End Date:</label>
-                <input type="date" name="end_date" id="end_date" value="<?php echo htmlspecialchars($end_date); ?>" style="padding: 8px; border-radius: 4px; border: 1px solid #444; background: #2c2c2c; color: #fff;">
-                <button type="submit" style="padding: 8px 16px; background: #ffd700; color: #000; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">Filter</button>
-                <a href="<?php echo $_SERVER['PHP_SELF']; ?>" style="margin-left: 10px; color: #ffd700; text-decoration: none;">Clear Filter</a>
-            </form>
+        <div class="button-row-center">
+            
+            <a href="../housekeeping.php" class="nav-btn"><i class="fas fa-arrow-left"></i> Back</a>
 
-
-            <!-- Performance Table -->
-            <?php if (!empty($staff_data)): ?>
-            <table class="performance-table">
-                <thead>
-                    <tr>
-                        <th>Staff Name</th>
-                        <th>Position</th>
-                        <th>Tasks Assigned</th>
-                        <th>Tasks In Progress</th>
-                        <th>Tasks Completed</th>
-                        <th>Task Time (hrs)</th>
-                        <th>Maintenance Requests</th>
-                        <th>Items Used</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($staff_data as $staff): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($staff['first_name'] . ' ' . $staff['last_name']); ?></td>
-                        <td><?php echo htmlspecialchars($staff['position_name']); ?></td>
-                        <td><?php echo $staff['performance']['assigned']; ?></td>
-                        <td><?php echo $staff['performance']['in_progress']; ?></td>
-                        <td><?php echo $staff['performance']['completed']; ?></td>
-                        <td><?php echo $staff['performance']['total_hours_formatted']; ?></td>
-                        <td><?php echo $staff['performance']['maintenance']; ?></td>
-                        <td><?php echo $staff['performance']['items_used']; ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-            <?php else: ?>
-            <p style="text-align: center; margin-top: 50px; color: rgba(255,255,255,0.7);">No housekeeping staff found.</p>
-            <?php endif; ?>
-
-            <a href="../housekeeping.php" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Housekeeping</a>
+            <button class="chart-btn" id="showChartBtn" style="margin: 0;">Show Performance Dashboard</button>
+            
+            <button id="openModal" class="glass-btn add-record-btn">
+                <i class="fas fa-plus"></i> Add Performance Record
+            </button>
         </div>
-    </div>
 
+        <div class="performance-grid-container">
+            <?php foreach ($performanceByStaff as $staffID => $data): ?>
+            <div class="staff-section">
+                <div class="staff-title"><?= htmlspecialchars($data['full_name']) ?> (<?= count($data['records']) ?> Records)</div>
+                <div class="record-grid">
+                    <?php foreach ($data['records'] as $record): ?>
+                    <div class="record-card">
+                        <div class="record-id">#<?= $record['performance_id'] ?></div>
+                        <div class="record-task"><i class="fas fa-user-tag"></i> <?= htmlspecialchars($record['staff_id']) ?></div>
+                        <div class="record-date"><i class="fas fa-calendar-alt"></i> <?= date('M j, Y', strtotime($record['created_at'])) ?></div>
+                        <div class="record-rating" style="background-color: <?= getScoreColor($record['score'], $scoreColors) ?>">
+                            Score: <?= round($record['score']) ?>%
+                        </div>
+                        <div class="record-detail">Category: <?= getScoreCategory($record['score']) ?></div>
+                        <div class="record-feedback">"<?= htmlspecialchars($record['remarks'] ?? 'No remarks provided.') ?>"</div>
+                        
+                        <div class="card-actions">
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="performance_id" value="<?= $record['performance_id'] ?>">
+                                <button type="submit" name="delete_performance" class="delete-btn" onclick="return confirm('Permanently delete this performance record?');"><i class="fas fa-trash"></i> Delete</button>
+                            </form>
+                            <button class="edit-btn" data-id="<?= $record['performance_id'] ?>" data-staff-id="<?= $record['staff_id'] ?>" data-score="<?= $record['score'] ?>" data-remarks="<?= htmlspecialchars($record['remarks'] ?? '') ?>"><i class="fas fa-edit"></i> Edit</button>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div id="chartModal" class="modal">
+            <div class="modal-content glass" style="max-width: 950px; width: 95%;">
+                <span class="close-modal close">&times;</span>
+                <h2>Housekeeping Performance Dashboard</h2>
+                
+                <div class="modal-content-grid">
+                    <div class="stats-in-modal">
+                        </div>
+    
+                    <div class="chart-section">
+                        <h3 style="color:var(--text-light); border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:10px;">6-Month Performance Trend by Category</h3>
+                        <div class="chart-container" style="background: none; border: none; box-shadow: none; padding: 0;">
+                            <canvas id="staffChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="legend-container">
+                    <?php foreach ($scoreColors as $category => $color): ?>
+                    <div class="legend-item"><span class="legend-color" style="background-color: <?= $color ?>"></span><span><?= $category ?></span></div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+
+        <div id="addModal" class="modal">
+            <div class="modal-content glass">
+                <span class="close add-close">&times;</span>
+                <h2>Add Performance Record</h2>
+                <form method="POST">
+                    <label for="staff_id">Staff Name:</label>
+                    <select name="staff_id" id="staff_id" required>
+                        <option value="">Select Staff</option>
+                        <?php foreach($staffList as $s) echo "<option value='{$s['staff_id']}'>{$s['full_name']}</option>"; ?>
+                    </select>
+                    <label for="score">Score (%):</label>
+                    <input type="number" id="score" name="score" min="1" max="100" step="0.01" placeholder="Score (e.g., 85.50)" required>
+                    
+                    <label for="remark_select">Select Predefined Remark:</label>
+                    <select name="remark_select" id="remark_select">
+                        <option value="">-- Optional Predefined Remark --</option>
+                        <?php foreach($predefinedRemarks as $remark) echo "<option value='" . htmlspecialchars($remark) . "'>{$remark}</option>"; ?>
+                    </select>
+                    
+                    <label for="notes">Notes (Optional Free-Form Text):</label>
+                    <textarea id="notes" name="notes" placeholder="Add specific details or additional notes..."></textarea>
+                    
+                    <button type="submit" name="add_performance"><i class="fas fa-plus"></i> Add Record</button>
+                </form>
+            </div>
+        </div>
+    </div> 
+</div> 
+<script>
+document.addEventListener('DOMContentLoaded', ()=>{
+    const chartModal = document.getElementById('chartModal');
+    const addModal = document.getElementById('addModal');
+    const showChartBtn = document.getElementById('showChartBtn');
+    const openAddBtn = document.getElementById('openModal');
+    const staffSections = document.querySelectorAll('.staff-section');
+    const editBtns = document.querySelectorAll('.edit-btn'); 
+
+    const showModal = (modalElement) => { modalElement.classList.add('show'); document.body.style.overflow = 'hidden'; };
+    const hideModal = (modalElement) => { modalElement.classList.remove('show'); document.body.style.overflow = ''; };
+
+    const initChart = () => {
+        const ctx = document.getElementById('staffChart').getContext('2d');
+        const existingChart = Chart.getChart(ctx);
+        if (existingChart) existingChart.destroy();
+        
+        new Chart(ctx, {
+            type:'line',
+            data:{
+                labels: <?= json_encode($monthLabels) ?>,
+                datasets: <?= json_encode($chartDatasets) ?>
+            },
+            options:{
+                responsive:true,
+                maintainAspectRatio:true,
+                aspectRatio: 2.2,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Records',
+                            color: '#f7f3ef'
+                        },
+                        ticks: {
+                            color: '#f7f3ef',
+                            callback: function(value) { if (Number.isInteger(value)) return value; }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#f7f3ef'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                },
+                plugins:{ 
+                    legend:{ 
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#f7f3ef'
+                        }
+                    }, 
+                    tooltip:{ 
+                        backgroundColor:'rgba(40, 28, 20, 0.9)', 
+                        titleColor: '#d2b48c', 
+                        bodyColor: '#f7f3ef',
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.parsed.y + ' Records';
+                                return label;
+                            }
+                        }
+                    } 
+                }
+            }
+        });
+    };
+
+    showChartBtn.addEventListener('click', () => { initChart(); showModal(chartModal); });
+    chartModal.querySelector('.close-modal').addEventListener('click', () => hideModal(chartModal));
+    window.addEventListener('click', e => { if(e.target === chartModal) hideModal(chartModal); });
+
+    openAddBtn.addEventListener('click', () => showModal(addModal));
+    addModal.querySelector('.add-close').addEventListener('click', () => hideModal(addModal));
+    window.addEventListener('click', e => { if(e.target === addModal) hideModal(addModal); });
+
+    staffSections.forEach(section => {
+        const title = section.querySelector('.staff-title');
+        title.addEventListener('click', () => {
+            section.classList.toggle('active');
+        });
+    });
+    
+    // Edit Button Action (Placeholder)
+    editBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const staffId = this.getAttribute('data-staff-id');
+            const score = this.getAttribute('data-score');
+            const remarks = this.getAttribute('data-remarks');
+            alert(`Edit Record ID: ${id}\nStaff ID: ${staffId}\nScore: ${score}%\nRemarks: "${remarks}"\n\n(A dedicated Edit Modal/Form is required for full functionality.)`);
+        });
+    });
+
+});
+</script>
 </body>
 </html>
-
 <?php $conn->close(); ?>

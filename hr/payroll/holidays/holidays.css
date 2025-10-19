@@ -68,13 +68,16 @@ table th {
     color: #4B5320;
 }
 
-table td input[type="number"] {
-    width: 80px;
+table td input[type="text"], table td input[type="date"], table td input[type="number"] {
     padding: 5px 10px;
     border: 1px solid #4B5320;
     border-radius: 6px;
     text-align: center;
     font-size: 1rem;
+}
+
+table td input[type="number"] {
+    width: 80px;
 }
 
 table tr:nth-child(even) {
@@ -83,6 +86,21 @@ table tr:nth-child(even) {
 
 table tr:hover {
     background-color: #E0E5D3;
+}
+
+.add-btn {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #27ae60;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.add-btn:hover {
+    background: #2ecc71;
 }
 
 .button-group {

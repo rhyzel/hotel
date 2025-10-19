@@ -111,10 +111,73 @@ foreach ($order as $item) {
     ]);
 }
 
+foreach ($order as $item) {
+    $recipe_name = $item['name'];
+    $qty_ordered = intval($item['qty']);
+    $used_by = $guest_name ?: 'Restaurant Guest';
+
+    $stmtRecipe = $conn->prepare("SELECT id FROM recipes WHERE recipe_name = ?");
+    $stmtRecipe->execute([$recipe_name]);
+    $recipe = $stmtRecipe->fetch(PDO::FETCH_ASSOC);
+
+    if ($recipe) {
+        $recipe_id = $recipe['id'];
+        $stmtIngredients = $conn->prepare("
+            SELECT ingredient_name, category, quantity_needed, unit 
+            FROM ingredients 
+            WHERE recipe_id = ?
+        ");
+        $stmtIngredients->execute([$recipe_id]);
+        $ingredients = $stmtIngredients->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($ingredients as $ingredient) {
+            $ingredient_name = $ingredient['ingredient_name'];
+            $category = $ingredient['category'] ?: null;
+            $used_qty = floatval($ingredient['quantity_needed']) * $qty_ordered;
+
+            $stmtInv = $conn->prepare("SELECT item_id, quantity_in_stock, category FROM inventory WHERE item = ?");
+            $stmtInv->execute([$ingredient_name]);
+            $invItem = $stmtInv->fetch(PDO::FETCH_ASSOC);
+
+            if ($invItem) {
+                $item_id = $invItem['item_id'];
+                $new_qty = max($invItem['quantity_in_stock'] - $used_qty, 0);
+                if (!$category) {
+                    $category = $invItem['category'];
+                }
+                if (!$category) {
+                    $category = 'Others';
+                }
+
+                $stmtUpdateInv = $conn->prepare("
+                    UPDATE inventory 
+                    SET quantity_in_stock = ?, used_qty = used_qty + ? 
+                    WHERE item_id = ?
+                ");
+                $stmtUpdateInv->execute([$new_qty, $used_qty, $item_id]);
+
+                $stmtUsage = $conn->prepare("
+                    INSERT INTO stock_usage 
+                    (order_id, item, category, guest_id, guest_name, quantity_used, used_by, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+                ");
+                $stmtUsage->execute([
+                    $order_id,
+                    $ingredient_name,
+                    $category,
+                    $guest_id,
+                    $guest_name,
+                    $used_qty,
+                    $used_by
+                ]);
+            }
+        }
+    }
+}
+
 $receipt_date = date('F j, Y, g:i A');
 $_SESSION['order_restaurant'] = [];
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>

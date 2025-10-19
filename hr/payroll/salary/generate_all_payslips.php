@@ -20,7 +20,7 @@ $month = date('F');
 $month_num = date('m');
 $year = date('Y');
 $save_path = __DIR__ . '/../payslips/';
-$logo_path = __DIR__ . '/../payroll/payslip/logo.png';
+$logo_path = "C:/xampp/htdocs/hotel/hr/payroll/logo.png";
 if (!is_dir($save_path)) mkdir($save_path, 0777, true);
 
 if(isset($_GET['delete']) && is_numeric($_GET['delete'])) {
@@ -39,11 +39,9 @@ if(isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     exit;
 }
 
-$result = $conn->query("SELECT * FROM staff");
-if ($result && $result->num_rows > 0) {
-    while($staff = $result->fetch_assoc()) {
-        if($staff['base_salary'] <= 0) continue;
-
+$staff_result = $conn->query("SELECT * FROM staff");
+if($staff_result && $staff_result->num_rows > 0){
+    while($staff = $staff_result->fetch_assoc()){
         $staff_id = $staff['staff_id'];
         $base_salary = $staff['base_salary'];
         $hourly_rate = $base_salary / (22*8);
@@ -114,6 +112,7 @@ if ($result && $result->num_rows > 0) {
         $check->bind_result($payslip_id,$pdf_file);
         $check->fetch();
 
+<<<<<<< Updated upstream
         $pdf = new FPDF();
         $pdf->AddPage();
         if(file_exists($logo_path)) $pdf->Image($logo_path,10,10,30);
@@ -175,6 +174,99 @@ if ($result && $result->num_rows > 0) {
 
         $check->close();
     }
+=======
+$pdf = new FPDF('P','mm','A4');
+$pdf->AddPage();
+
+$pdf->SetDrawColor(0,0,0);
+$pdf->SetLineWidth(0.5);
+if(file_exists($logo_path)) $pdf->Image($logo_path, ($pdf->GetPageWidth()-40)/2, 5, 40);
+
+$pdf->Ln(30);
+$pdf->SetFont('Arial','B',12);
+$pdf->Cell(0,20,"Payslip for $month $year",0,1,'C'); // added 20px top margin
+$pdf->Ln(10);
+
+$pdf->SetFont('Arial','',11);
+$pdf->Cell(50,7,"Employee ID:",0,0);
+$pdf->Cell(0,7,$staff_id,0,1);
+$pdf->Cell(50,7,"Employee Name:",0,0);
+$pdf->Cell(0,7,$staff['first_name'].' '.$staff['last_name'],0,1);
+$pdf->Cell(50,7,"Position:",0,0);
+$pdf->Cell(0,7,$staff['position_name'],0,1);
+$pdf->Cell(50,7,"Department:",0,0);
+$pdf->Cell(0,7,$staff['department_name'],0,1);
+$pdf->Cell(50,7,"Hire Date:",0,0);
+$pdf->Cell(0,7,$staff['hire_date'],0,1);
+$pdf->Ln(8);
+
+$pdf->SetFont('Arial','B',11);
+$pdf->SetFillColor(0,0,0);
+$pdf->SetTextColor(255,255,255);
+$pdf->Cell(120,8,"Description",1,0,'C',true);
+$pdf->Cell(60,8,"Amount (₱)",1,1,'C',true);
+$pdf->SetFont('Arial','',11);
+$pdf->SetTextColor(0,0,0);
+
+$earnings = [
+    ["Base Salary", $base_salary],
+    ["Worked Salary ($total_hours hrs)", $worked_salary],
+    ["Holiday Pay ($holiday_hours hrs)", $holiday_pay],
+    ["Overtime Pay ($total_ot_hours hrs)", $ot_pay],
+    ["Bonuses/Incentives", $total_bonus],
+    ["Reimbursements", $total_reimburse],
+    ["Gross Pay", $gross]
+];
+
+foreach($earnings as $e){
+    $pdf->Cell(120,7,$e[0],1);
+    $pdf->Cell(60,7,number_format($e[1],2),1,1,'R');
+}
+
+$pdf->Ln(5);
+
+$pdf->SetFont('Arial','B',11);
+$pdf->SetFillColor(0,0,0);
+$pdf->SetTextColor(255,255,255);
+$pdf->Cell(120,8,"Deductions",1,0,'C',true);
+$pdf->Cell(60,8,"Amount (₱)",1,1,'C',true);
+$pdf->SetFont('Arial','',11);
+$pdf->SetTextColor(0,0,0);
+
+$deductions_arr = [
+    ["SSS Deduction", $deductions['sss']],
+    ["PhilHealth Deduction", $deductions['philhealth']],
+    ["Pag-IBIG Deduction", $deductions['pagibig']],
+    ["Withholding Tax", $deductions['withholding']],
+    ["Other Deductions", $other_deduction],
+    ["Total Deductions", $total_deductions]
+];
+
+foreach($deductions_arr as $d){
+    $pdf->Cell(120,7,$d[0],1);
+    $pdf->Cell(60,7,number_format($d[1],2),1,1,'R');
+}
+
+$pdf->SetFont('Arial','B',11);
+$pdf->Cell(120,7,"Net Pay",1);
+$pdf->Cell(60,7,number_format($net,2),1,1,'R');
+
+$pdf->Ln(10);
+$pdf->SetFont('Arial','I',10);
+$pdf->Cell(0,7,"This is a system-generated payslip.",0,1,'C');
+
+$filename = $staff_id."_{$month}.pdf";
+$file_path = $save_path.$filename;
+$pdf->Output('F',$file_path);
+
+$stmt = $conn->prepare("INSERT INTO payslip (staff_id, month, year, amount, status, sss, philhealth, pagibig, withholding_tax, other_deduction, total_deductions, net_salary, pdf_file) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE pdf_file=VALUES(pdf_file), amount=VALUES(amount), sss=VALUES(sss), philhealth=VALUES(philhealth), pagibig=VALUES(pagibig), withholding_tax=VALUES(withholding_tax), other_deduction=VALUES(other_deduction), total_deductions=VALUES(total_deductions), net_salary=VALUES(net_salary), status='pending'");
+$stmt->bind_param("siidddddddds",$staff_id,$month_num,$year,$gross,$deductions['sss'],$deductions['philhealth'],$deductions['pagibig'],$deductions['withholding'],$other_deduction,$total_deductions,$net,$filename);
+$stmt->execute();
+$check->close();
+
+
+}
+>>>>>>> Stashed changes
 }
 
 $sql = "SELECT p.id, p.staff_id, s.first_name, s.last_name, p.pdf_file 

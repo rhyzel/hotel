@@ -81,13 +81,18 @@ foreach ($order as $id => $item) {
         $total
     ]);
 
+    $stmt = $conn->prepare("SELECT category FROM inventory WHERE item = ? LIMIT 1");
+    $stmt->execute([$item['name']]);
+    $category_row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $category = $category_row['category'] ?? 'Uncategorized';
+
     $used_by = $guest_name;
     $stmt = $conn->prepare("
         INSERT INTO stock_usage
-        (order_id, item, guest_id, guest_name, quantity_used, used_by, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, NOW())
+        (order_id, item, category, guest_id, guest_name, quantity_used, used_by, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
     ");
-    $stmt->execute([$order_id, $item['name'], $guest_id, $guest_name, $qty, $used_by]);
+    $stmt->execute([$order_id, $item['name'], $category, $guest_id, $guest_name, $qty, $used_by]);
 }
 
 $_SESSION['order_minibar'] = [];

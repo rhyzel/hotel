@@ -35,7 +35,7 @@
   <span>Billing & Payments</span>
 </a>
 
-        <a href="crm.php" class="module">
+        <a href="../crm/crm.php" class="module">
           <i class="fas fa-user-friends"></i>
           <span>Guest Relationship Management </span>
        <a href="../hr/employee_login.php" class="module">
@@ -52,7 +52,7 @@
           <i class="fas fa-utensils"></i>
           <span>Kitchen & Restaurant </span>
         </a>
-        <a href="maintenance.php" class="module">
+        <a href="../maintenance/maintenance.php" class="module">
           <i class="fas fa-tools"></i>
           <span>Maintenance</span>
         </a>

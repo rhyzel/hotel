@@ -55,7 +55,7 @@ if ($holidaysResult && $holidaysResult->num_rows > 0) {
       <h2>HOTEL LA VISTA</h2>
       <p>Salary For - <?= date('F Y'); ?></p>
       <div class="header-controls">
-        <a href="http://localhost/hotel/hr/payroll/payroll.php" class="nav-btn">&#8592; Back To Dashboard</a>
+        <a href="../hr/payroll/payroll.php" class="nav-btn">&#8592; Back To Dashboard</a>
         <form method="get" class="filter-form">
           <select name="filter" onchange="this.form.submit()">
             <option value="All" <?= $filter=='All' ? 'selected' : '' ?>>All</option>

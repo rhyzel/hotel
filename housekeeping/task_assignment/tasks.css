@@ -6,13 +6,12 @@
 }
 
 body, html {
-   height: 100%;
-   font-family: 'Outfit', sans-serif;
-   background: url('/hotel/homepage/hotel_room.jpg') no-repeat center center fixed;
-   background-size: cover;
-   color: #fff;
-   line-height: 1.6;
-   font-size: small;
+  height: 100%;
+  font-family: 'Outfit', sans-serif;
+  background: url('../../homepage/hotel_room.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+  line-height: 1.6;
 }
 
 /* ==== Overlay ==== */
@@ -35,12 +34,12 @@ body, html {
 
 /* ==== Header ==== */
 header h1 {
-   font-size: 2.2rem;
-   font-weight: 600;
-   letter-spacing: 1px;
-   margin-bottom: 10px;
-   color: #ffd700;
-   text-shadow: 0 3px 8px rgba(0,0,0,0.6);
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+  color: #ffd700;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.6);
 }
 
 header p {
@@ -71,19 +70,18 @@ header p {
 
 /* ==== Assignment Form ==== */
 .assignment-form {
-   display: flex;
-   flex-direction: column;
-   gap: 15px;
-   margin-bottom: 30px;
-   background: rgba(255, 255, 255, 0.08);
-   padding: 20px;
-   border-radius: 12px;
-   backdrop-filter: blur(12px);
-   -webkit-backdrop-filter: blur(12px);
-   box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-   max-width: 400px;
-   margin-left: auto;
-   margin-right: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: 40px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 25px;
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
 .assignment-form label {
@@ -109,15 +107,14 @@ header p {
 }
 
 .btn-assign {
-   padding: 8px 16px;
-   background: #ffd700;
-   color: #000;
-   border: none;
-   border-radius: 6px;
-   font-weight: 600;
-   font-size: 0.9rem;
-   cursor: pointer;
-   transition: all 0.3s;
+  padding: 12px 20px;
+  background: #ffd700;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 .btn-assign:hover {
   background: #ffea70;
@@ -126,9 +123,9 @@ header p {
 
 /* ==== Task Table ==== */
 h2 {
-   margin-bottom: 15px;
-   font-size: 1.5rem;
-   color: #ffd700;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  color: #ffd700;
 }
 
 .tasks-table {
@@ -146,10 +143,9 @@ h2 {
 
 .tasks-table th,
 .tasks-table td {
-   padding: 8px 10px;
-   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-   text-align: center;
-   font-size: 0.85rem;
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
 }
 
 .tasks-table th {
@@ -189,48 +185,45 @@ h2 {
 
 /* ==== Action Buttons ==== */
 .btn-update {
-   padding: 6px 10px;
-   background: #ffd700;
-   color: #000;
-   border: none;
-   border-radius: 4px;
-   cursor: pointer;
-   font-weight: 500;
-   font-size: 0.8rem;
-   transition: 0.3s;
-   display: inline-block;
+  padding: 8px 12px;
+  background: #ffd700;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+  display: inline-block;
 }
 .btn-update:hover {
   background: #e5c100;
 }
 
 .btn-maintenance {
-   padding: 6px 10px;
-   background: #007bff;
-   color: #fff;
-   border: none;
-   border-radius: 4px;
-   cursor: pointer;
-   font-weight: 500;
-   font-size: 0.8rem;
-   transition: 0.3s;
-   display: inline-block;
+  padding: 8px 12px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+  display: inline-block;
 }
 .btn-maintenance:hover {
   background: #0056b3;
 }
 
 .btn-add-item {
-   padding: 6px 10px;
-   background: #28a745;
-   color: #fff;
-   border: none;
-   border-radius: 4px;
-   cursor: pointer;
-   font-weight: 500;
-   font-size: 0.8rem;
-   transition: 0.3s;
-   display: inline-block;
+  padding: 8px 12px;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+  display: inline-block;
 }
 .btn-add-item:hover {
   background: #218838;
@@ -291,18 +284,18 @@ h2 {
 
 /* ==== Modal Container ==== */
 .modal {
-   background: #1e1e1e;
-   padding: 25px 20px;
-   border-radius: 12px;
-   width: 500px;
-   max-width: 95%;
-   max-height: 90vh;
-   overflow-y: auto;
-   box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-   color: #fff;
-   text-align: left;
-   position: relative;
-   animation: fadeIn 0.3s ease;
+  background: #1e1e1e;
+  padding: 30px 25px;
+  border-radius: 12px;
+  width: 700px;
+  max-width: 95%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  color: #fff;
+  text-align: left;
+  position: relative;
+  animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {
@@ -342,17 +335,16 @@ h2 {
 }
 
 .modal .btn-submit {
-   width: 100%;
-   padding: 10px;
-   background: #ffd700;
-   border: none;
-   border-radius: 6px;
-   font-weight: 500;
-   font-size: 0.9rem;
-   cursor: pointer;
-   transition: 0.3s;
-   color: #000;
-   margin-top: 15px;
+  width: 100%;
+  padding: 12px;
+  background: #ffd700;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  color: #000;
+  margin-top: 20px;
 }
 
 .modal .btn-submit:hover {
@@ -407,10 +399,9 @@ select option {
 
 /* ==== Form Input Readonly Styling ==== */
 input[readonly] {
-   background-color: #444 !important;
-   cursor: not-allowed !important;
-   color: #fff !important;
-   border: 1px solid #555 !important;
+  background-color: #f8f9fa !important;
+  cursor: not-allowed !important;
+  color: #6c757d !important;
 }
 
 /* ==== Dark Theme Scrollbar ==== */

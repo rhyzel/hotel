@@ -1,0 +1,108 @@
+body {
+    font-family: 'Outfit', sans-serif;
+    background:
+        linear-gradient(rgba(60, 40, 25, 0.6), rgba(60, 40, 25, 0.6)),
+        url('../hotel_room.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #f5ebe0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.request-container {
+    background: #fffaf5;
+    padding: 25px 30px;
+    border-radius: 14px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+    width: 360px;
+    text-align: center;
+}
+
+.request-container h1 {
+    color: #3e2f20;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+.request-container h1 i {
+    color: #a47148;
+    margin-right: 8px;
+}
+
+.request-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #5c4532;
+    font-size: 14px;
+}
+
+.form-group select,
+.form-group input {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid #d9c2a7;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    background-color: #fffaf3;
+    transition: 0.3s ease;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+    border-color: #a47148;
+    box-shadow: 0 0 6px rgba(164, 113, 72, 0.4);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn-submit,
+.btn-cancel {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn-submit {
+    background-color: #7b4b2a;
+    color: #fffaf3;
+    margin-right: 8px;
+}
+
+.btn-submit:hover {
+    background-color: #5c3720;
+}
+
+.btn-cancel {
+    background-color: #c89f73;
+    color: #fffaf3;
+}
+
+.btn-cancel:hover {
+    background-color: #b2875c;
+}

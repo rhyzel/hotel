@@ -1,0 +1,153 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Background setup */
+body, html {
+  height: 100%;
+  background: url('../hotel_room.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
+
+/* Overlay container */
+.overlay {
+  background: rgba(0,0,0,0.6);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+/* Main container */
+.container.payroll-container {
+  max-width: 1200px;
+  width: 100%;
+  color: #fff;
+  text-align: center;
+}
+
+/* Header section */
+.container.payroll-container header h1 {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.container.payroll-container .lead {
+  font-size: 16px;
+  opacity: 0.85;
+  margin-bottom: 32px;
+}
+
+/* Payroll modules grid */
+.payroll-modules {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+  margin: 0 auto 28px;
+}
+
+/* Module card styling */
+.module-card {
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 28px 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Remove link underline and blue color */
+a.module-card {
+  text-decoration: none;
+  color: inherit;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Hover animation */
+.module-card:hover,
+a.module-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+}
+
+/* Icon and text */
+.module-card i {
+  font-size: 34px;
+  color: #ffd700; /* gold */
+  margin-bottom: 12px;
+}
+
+.module-card h3,
+.module-card span {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.module-card p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.85);
+  opacity: 0.9;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Back button styling */
+.actions {
+  text-align: center;
+  margin-top: 12px;
+}
+
+.back-btn {
+  padding: 12px 24px;
+  background: #ffca08; /* yellow */
+  color: #222;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.back-btn i {
+  margin-right: 8px;
+}
+
+.back-btn:hover {
+  filter: brightness(0.95);
+}
+
+/* Responsive layout */
+@media (max-width: 1000px) {
+  .payroll-modules {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .payroll-modules {
+    grid-template-columns: 1fr;
+  }
+
+  .container.payroll-container header h1 {
+    font-size: 34px;
+  }
+}

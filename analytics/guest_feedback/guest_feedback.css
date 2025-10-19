@@ -1,0 +1,239 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  font-family: 'Outfit', sans-serif;
+  background: 
+    linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)),
+    url('../../homepage/hotel_room.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+.overlay {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 25px;
+}
+
+/* HEADER */
+header {
+  text-align: center;
+  color: #fff;
+  margin-bottom: 35px;
+}
+
+header h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #e69419;
+  letter-spacing: 0.5px;
+}
+
+header p {
+  font-size: 1rem;
+  opacity: 0.85;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s ease-in-out;
+}
+
+.tab-btn:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.tab-btn.active {
+  background: #e69419;
+  color: #000;
+  transform: scale(1.03);
+}
+
+/* CARDS */
+.card {
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  margin-bottom: 30px;
+  width: 100%;
+  max-width: 1400px;
+  animation: fadeIn 0.4s ease;
+}
+
+.card h2 {
+  color: #e69419;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* CHARTS */
+.chart-container {
+  position: relative;
+  margin: 0 auto;
+  padding: 10px;
+  width: 95%;
+  height: 450px;
+}
+
+/* TABLES */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  color: white;
+  font-size: 0.9rem;
+}
+
+th, td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+th {
+  background-color: rgba(255,255,255,0.1);
+  text-align: left;
+  font-weight: 600;
+}
+
+tbody tr:hover {
+  background-color: rgba(255,255,255,0.05);
+}
+
+/* FILTER DROPDOWNS */
+.filter-form {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.filter-form select {
+  padding: 8px 30px 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.25s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='white' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px 6px;
+}
+
+.filter-form select:focus {
+  outline: none;
+  border-color: #e69419;
+  background: rgba(255,255,255,0.15);
+}
+
+/* BACK BUTTON */
+a.back-link {
+  position: fixed;
+  top: 25px;
+  left: 25px;
+  padding: 10px 18px;
+  background: #e69419;
+  color: #000;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 10;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  transition: all 0.2s ease-in-out;
+}
+
+a.back-link:hover {
+  transform: translateY(-2px);
+  background: #ffb647;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* BUTTON */
+#backToTop {
+  margin: 25px auto;
+  display: block;
+  padding: 10px 18px;
+  background: #17a2b8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+#backToTop:hover {
+  background: #138496;
+  transform: scale(1.05);
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.export-btn {
+  padding: 8px 18px;
+  background: #e69419;
+  border: none;
+  color: #000;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.export-btn:hover {
+  background: #ffb64c;
+  transform: scale(1.05);
+}

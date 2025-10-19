@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS `guest_billing` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `guest_id` int(11) NOT NULL,
+  `order_id` varchar(50) DEFAULT NULL,
+  `order_type` varchar(50) DEFAULT NULL,
+  `item_name` text DEFAULT NULL,
+  `total_amount` decimal(10,2) DEFAULT 0.00,
+  `payment_option` varchar(50) DEFAULT NULL,
+  `payment_method` varchar(50) DEFAULT NULL,
+  `partial_payment` decimal(10,2) DEFAULT 0.00,
+  `remaining_amount` decimal(10,2) DEFAULT 0.00,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `guest_id` (`guest_id`),
+  CONSTRAINT `guest_billing_ibfk_1` FOREIGN KEY (`guest_id`) REFERENCES `guests` (`guest_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

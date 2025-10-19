@@ -119,11 +119,13 @@ if ($guest) {
 </header>
 <div class="grid-container">
 <div class="left-container">
+<div class="search-box">
 <form method="get" class="guest-load-form">
     <input type="text" name="guest" placeholder="Guest ID or Name" value="<?= htmlspecialchars($guest_input ?? '') ?>">
     <button type="submit">Load Guest</button>
     <button type="submit" name="clear_cart">Clear</button>
 </form>
+</div>
 <?php if ($guest): ?>
 <?php
 $reservation_stmt = $conn->prepare("SELECT * FROM reservations WHERE guest_id = ? ORDER BY check_in DESC LIMIT 1");

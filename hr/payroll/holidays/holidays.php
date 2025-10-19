@@ -15,12 +15,30 @@ if ($holidayResult && $holidayResult->num_rows > 0) {
 <meta charset="UTF-8">
 <title>Manage Holidays - Hotel La Vista</title>
 <link rel="stylesheet" href="holidays.css">
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    .add-btn { margin-top: 10px; padding: 8px 12px; background: #27ae60; color: white; border: none; cursor: pointer; }
+    .add-btn:hover { background: #2ecc71; }
+</style>
+<script>
+function addHolidayRow() {
+    const tbody = document.querySelector('table tbody');
+    const newRow = document.createElement('tr');
+
+    newRow.innerHTML = `
+        <td>New</td>
+        <td><input type="text" name="new_name[]" placeholder="Holiday Name" required></td>
+        <td><input type="date" name="new_date[]" required></td>
+        <td><input type="number" name="new_percentage[]" value="100" min="0" max="200" step="0.1" required></td>
+    `;
+    tbody.appendChild(newRow);
+}
+</script>
 </head>
 <body>
 <div class="overlay">
     <div class="container">
-        <h2>Upcoming Holidays</h2>
+        <h2>Manage Holidays</h2>
         <form action="save_holiday_percentage.php" method="post">
             <table>
                 <thead>
@@ -36,8 +54,12 @@ if ($holidayResult && $holidayResult->num_rows > 0) {
                         <?php foreach($holidays as $h): ?>
                             <tr>
                                 <td><?= $h['id'] ?></td>
-                                <td><?= htmlspecialchars($h['name']) ?></td>
-                                <td><?= date('F j, Y', strtotime($h['date'])) ?></td>
+                                <td>
+                                    <input type="text" name="name[<?= $h['id'] ?>]" value="<?= htmlspecialchars($h['name']) ?>" required>
+                                </td>
+                                <td>
+                                    <input type="date" name="date[<?= $h['id'] ?>]" value="<?= $h['date'] ?>" required>
+                                </td>
                                 <td>
                                     <input type="number" name="percentage[<?= $h['id'] ?>]" value="<?= $h['percentage'] ?? 100 ?>" min="0" max="200" step="0.1" required>
                                 </td>
@@ -48,7 +70,8 @@ if ($holidayResult && $holidayResult->num_rows > 0) {
                     <?php endif; ?>
                 </tbody>
             </table>
-            <div class="button-group">
+            <button type="button" class="add-btn" onclick="addHolidayRow()"><i class="fas fa-plus"></i> Add Holiday</button>
+            <div class="button-group" style="margin-top:10px;">
                 <a href="http://localhost/hotel/hr/payroll/payroll.php" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
                 <button type="submit" class="save-btn"><i class="fas fa-save"></i> Save Changes</button>
             </div>
